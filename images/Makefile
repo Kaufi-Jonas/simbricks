@@ -1,25 +1,28 @@
+include mk/subdir_pre.mk
+
 PACKER_VERSION := 1.6.0
 KERNEL_VERSION := 5.4.46
 
-UBUNTU_IMAGE := output-ubuntu1804/ubuntu1804
-BASE_IMAGE := output-base/base
-NOPAXOS_IMAGE := output-nopaxos/nopaxos
-MTCP_IMAGE := output-mtcp/mtcp
-TAS_IMAGE := output-tas/tas
+UBUNTU_IMAGE := $(d)output-ubuntu1804/ubuntu1804
+BASE_IMAGE := $(d)output-base/base
+NOPAXOS_IMAGE := $(d)output-nopaxos/nopaxos
+MTCP_IMAGE := $(d)output-mtcp/mtcp
+TAS_IMAGE := $(d)output-tas/tas
 IMAGES := $(BASE_IMAGE) $(NOPAXOS_IMAGE) $(MTCP_IMAGE) $(TAS_IMAGE)
 RAW_IMAGES := $(addsuffix .raw,$(IMAGES))
 
-QEMU_IMG := ../qemu/build/qemu-img
+img_dir := $(d)
+packer := $(d)packer
 
-all: $(IMAGES) $(RAW_IMAGES) vmlinux bzImage mqnic/mqnic.ko
+bz_image := $(d)bzImage
+vmlinux := $(d)vmlinux
+kernel_pardir := $(d)kernel
+kernel_dir := $(kernel_pardir)/linux-$(KERNEL_VERSION)
+kheader_dir := $(d)kernel/kheaders
+mqnic_dir := $(d)mqnic
+mqnic_mod := $(mqnic_dir)/mqnic.ko
 
-clean:
-	rm -rf packer packer_cache vmlinux bzImage \
-	    mqnic/mqnic.ko mqnic/*.o mqnic/.*.cmd mqnic/mqnic.mod.c \
-	    mqnic/Module.symvers mqnic/modules.order \
-	    output-ubuntu1804 output-base output-mtcp output-nopaxos \
-	    output-tas \
-	    kernel/linux-$(KERNEL_VERSION)/ kheaders.tar.bz2
+build-images: $(IMAGES) $(RAW_IMAGES) $(vmlinux) $(bz_image) $(mqnic_mod)
 
 ################################################
 # Disk image
@@ -27,95 +30,104 @@ clean:
 %.raw: %
 	$(QEMU_IMG) convert -f qcow2 -O raw $< $@
 
-$(UBUNTU_IMAGE): ubuntu1804.json packer scripts/vagrant.sh scripts/sshd.sh \
-    scripts/update.sh scripts/packages.sh scripts/cleanup.sh scripts/preseed.cfg
-	rm -rf output-ubuntu1804
-	./packer-wrap.sh build ubuntu1804.json
+$(UBUNTU_IMAGE): $(packer) $(QEMU) $(addprefix $(d),ubuntu1804.json \
+    scripts/vagrant.sh scripts/sshd.sh scripts/update.sh scripts/packages.sh \
+    scripts/cleanup.sh scripts/preseed.cfg)
+	rm -rf $(dir $@)
+	cd $(img_dir) && ./packer-wrap.sh build ubuntu1804.json
 	touch $@
 
-$(BASE_IMAGE): base.json packer $(UBUNTU_IMAGE) bzImage kheaders.tar.bz2 \
-    scripts/guestinit.sh
-	rm -rf output-base
-	./packer-wrap.sh build base.json
+$(BASE_IMAGE): $(packer) $(QEMU) $(d)base.json $(UBUNTU_IMAGE) $(bz_image) \
+    $(d)kheaders.tar.bz2 $(d)scripts/guestinit.sh
+	rm -rf $(dir $@)
+	cd $(img_dir) && ./packer-wrap.sh build base.json
 	touch $@
 
-$(NOPAXOS_IMAGE): nopaxos.json packer $(BASE_IMAGE) scripts/install-nopaxos.sh \
-    nopaxos.config
-	rm -rf output-nopaxos
-	./packer-wrap.sh build nopaxos.json
+$(NOPAXOS_IMAGE): $(packer) $(QEMU) $(d)nopaxos.json $(BASE_IMAGE) \
+    $(addprefix $(d), scripts/install-nopaxos.sh nopaxos.config)
+	rm -rf $(dir $@)
+	cd $(img_dir) && ./packer-wrap.sh build nopaxos.json
 	touch $@
 
-$(MTCP_IMAGE): mtcp.json packer $(BASE_IMAGE) scripts/install-mtcp.sh
-	rm -rf output-mtcp
-	./packer-wrap.sh build mtcp.json
+$(MTCP_IMAGE): $(packer) $(QEMU) $(d)mtcp.json $(BASE_IMAGE) \
+    $(d)scripts/install-mtcp.sh
+	rm -rf $(dir $@)
+	cd $(img_dir) && ./packer-wrap.sh build mtcp.json
 	touch $@
 
-$(TAS_IMAGE): tas.json packer $(BASE_IMAGE) scripts/install-tas.sh
-	rm -rf output-tas
-	./packer-wrap.sh build tas.json
+$(TAS_IMAGE): $(packer) $(QEMU) $(d)tas.json $(BASE_IMAGE) \
+    $(d)scripts/install-tas.sh
+	rm -rf $(dir $@)
+	cd $(img_dir) && ./packer-wrap.sh build tas.json
 	touch $@
 
-packer:
-	wget https://releases.hashicorp.com/packer/$(PACKER_VERSION)/packer_$(PACKER_VERSION)_linux_amd64.zip
-	unzip packer_$(PACKER_VERSION)_linux_amd64.zip
-	rm -f packer_$(PACKER_VERSION)_linux_amd64.zip
+$(packer):
+	wget -O $(img_dir)packer_$(PACKER_VERSION)_linux_amd64.zip https://releases.hashicorp.com/packer/$(PACKER_VERSION)/packer_$(PACKER_VERSION)_linux_amd64.zip
+	cd $(img_dir) && unzip packer_$(PACKER_VERSION)_linux_amd64.zip
+	rm -f $(img_dir)packer_$(PACKER_VERSION)_linux_amd64.zip
 
 
 ################################################
 # Kernel
 
-KERNEL_DIR := kernel/linux-$(KERNEL_VERSION)
-
-$(KERNEL_DIR)/vmlinux: $(KERNEL_DIR)/.config
-	$(MAKE) -C $(KERNEL_DIR)
+$(kernel_dir)/vmlinux: $(kernel_dir)/.config
+	$(MAKE) -C $(kernel_dir)
 	touch $@
 
-vmlinux: $(KERNEL_DIR)/vmlinux
-	cp kernel/linux-$(KERNEL_VERSION)/vmlinux vmlinux
+$(vmlinux): $(kernel_dir)/vmlinux
+	cp $< $@
 	touch $@
 
 # this dependency is a bit stupid, but not sure how to better do this
-bzImage: $(KERNEL_DIR)/vmlinux
-	cp $(KERNEL_DIR)/arch/x86_64/boot/bzImage bzImage
+$(bz_image): $(kernel_dir)/vmlinux
+	cp $(kernel_dir)/arch/x86_64/boot/bzImage $@
 	touch $@
 
-kheaders.tar.bz2:
-	rm -rf ./kernel/kheaders
-	mkdir -p ./kernel/kheaders
-	$(MAKE) -C $(KERNEL_DIR) headers_install INSTALL_HDR_PATH=$(abspath ./kernel/kheaders/usr)
-	$(MAKE) -C $(KERNEL_DIR) modules_install INSTALL_MOD_PATH=$(abspath ./kernel/kheaders)
-	rm -f ./kernel/kheaders/lib/modules/$(KERNEL_VERSION)/build
+$(d)kheaders.tar.bz2: $(kernel_dir)/vmlinux
+	rm -rf $(kheader_dir)
+	mkdir -p $(kheader_dir)
+	$(MAKE) -C $(kernel_dir) headers_install INSTALL_HDR_PATH=$(abspath $(kheader_dir)/usr)
+	$(MAKE) -C $(kernel_dir) modules_install INSTALL_MOD_PATH=$(abspath $(kheader_dir))
+	rm -f $(kheader_dir)/lib/modules/$(KERNEL_VERSION)/build
 	ln -s /usr/src/linux-headers-$(KERNEL_VERSION) \
-	    ./kernel/kheaders/lib/modules/$(KERNEL_VERSION)/build
-	rm -f ./kernel/kheaders/lib/modules/$(KERNEL_VERSION)/source
-	mkdir -p ./kernel/kheaders/usr/src/linux-headers-$(KERNEL_VERSION)
-	cp -r $(KERNEL_DIR)/.config $(KERNEL_DIR)/Makefile \
-	    $(KERNEL_DIR)/Module.symvers $(KERNEL_DIR)/scripts \
-	    $(KERNEL_DIR)/include \
-	    ./kernel/kheaders/usr/src/linux-headers-$(KERNEL_VERSION)/
-	mkdir -p ./kernel/kheaders/usr/src/linux-headers-$(KERNEL_VERSION)/tools/objtool/
-	cp $(KERNEL_DIR)/tools/objtool/objtool \
-	    ./kernel/kheaders/usr/src/linux-headers-$(KERNEL_VERSION)/tools/objtool/
-	mkdir -p ./kernel/kheaders/usr/src/linux-headers-$(KERNEL_VERSION)/arch/x86/
-	cp -r $(KERNEL_DIR)/arch/x86/Makefile \
-	    $(KERNEL_DIR)/arch/x86/Makefile_32.cpu \
-	    $(KERNEL_DIR)/arch/x86/Makefile.um \
-	    $(KERNEL_DIR)/arch/x86/include \
-	    ./kernel/kheaders/usr/src/linux-headers-$(KERNEL_VERSION)/arch/x86
-	cd ./kernel/kheaders && tar cjf ../../$@ .
+	    $(kheader_dir)/lib/modules/$(KERNEL_VERSION)/build
+	rm -f $(kheader_dir)/lib/modules/$(KERNEL_VERSION)/source
+	mkdir -p $(kheader_dir)/usr/src/linux-headers-$(KERNEL_VERSION)
+	cp -r $(kernel_dir)/.config $(kernel_dir)/Makefile \
+	    $(kernel_dir)/Module.symvers $(kernel_dir)/scripts \
+	    $(kernel_dir)/include \
+	    $(kheader_dir)/usr/src/linux-headers-$(KERNEL_VERSION)/
+	mkdir -p $(kheader_dir)/usr/src/linux-headers-$(KERNEL_VERSION)/tools/objtool/
+	cp $(kernel_dir)/tools/objtool/objtool \
+	    $(kheader_dir)/usr/src/linux-headers-$(KERNEL_VERSION)/tools/objtool/
+	mkdir -p $(kheader_dir)/usr/src/linux-headers-$(KERNEL_VERSION)/arch/x86/
+	cp -r $(kernel_dir)/arch/x86/Makefile \
+	    $(kernel_dir)/arch/x86/Makefile_32.cpu \
+	    $(kernel_dir)/arch/x86/Makefile.um \
+	    $(kernel_dir)/arch/x86/include \
+	    $(kheader_dir)/usr/src/linux-headers-$(KERNEL_VERSION)/arch/x86
+	cd $(kheader_dir) && tar cjf $(abspath $@) .
 
-kernel/linux-$(KERNEL_VERSION)/.config: kernel/config-$(KERNEL_VERSION)
-	wget https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-$(KERNEL_VERSION).tar.xz
-	tar xf linux-$(KERNEL_VERSION).tar.xz
-	rm -f linux-$(KERNEL_VERSION).tar.xz
-	rm -rf kernel/linux-$(KERNEL_VERSION)
-	mv linux-$(KERNEL_VERSION) kernel/
-	cd kernel/linux-$(KERNEL_VERSION) && patch -p1 < ../linux-$(KERNEL_VERSION)-timers-gem5.patch
-	cp kernel/config-$(KERNEL_VERSION) kernel/linux-$(KERNEL_VERSION)/.config
+$(kernel_dir)/.config: $(kernel_pardir)/config-$(KERNEL_VERSION)
+	rm -rf $(kernel_dir)
+	wget -O - https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-$(KERNEL_VERSION).tar.xz | \
+	    tar xJf - -C $(kernel_pardir)
+	cd $(kernel_dir) && patch -p1 < ../linux-$(KERNEL_VERSION)-timers-gem5.patch
+	cp $< $@
 
 ################################################
 # mqnic kernel module
 
-mqnic/mqnic.ko: vmlinux
-	$(MAKE) -C kernel/linux-$(KERNEL_VERSION) M=`pwd`/mqnic/ modules
+$(mqnic_mod): $(vmlinux)
+	$(MAKE) -C $(kernel_dir) M=$(abspath $(mqnic_dir)) modules
 	touch $@
+
+
+CLEAN := $(addprefix $(d), mqnic/mqnic.ko mqnic/*.o mqnic/.*.cmd \
+    mqnic/mqnic.mod.c mqnic/Module.symvers mqnic/modules.order)
+
+DISTCLEAN := $(kernel_dir) $(packer) \
+    $(foreach i,$(IMAGES),$(dir $(i))) \
+    $(d)packer_cache $(d)kheaders.tar.bz2
+
+include mk/subdir_post.mk

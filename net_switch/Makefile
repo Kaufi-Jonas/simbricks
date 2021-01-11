@@ -1,11 +1,14 @@
-CPPFLAGS := -I../proto -I../netsim_common/include
-CFLAGS := -Wall -Wextra -O3
-LD := g++
+include mk/subdir_pre.mk
 
-all: net_switch
+bin_net_switch := $(d)net_switch
 
-net_switch: net_switch.o ../netsim_common/libnetsim_common.a
-	$(LD) -o $@ $^
+OBJS := $(d)net_switch.o
 
-clean:
-	rm -f *.o net_switch
+$(OBJS): CPPFLAGS := $(CPPFLAGS) -I$(d)include/ -I$(lib_proto_inc) \
+    -I$(lib_netsim_inc)
+
+$(bin_net_switch): $(OBJS) $(lib_netsim) -lpcap
+
+CLEAN := $(bin_net_switch) $(OBJS)
+ALL := $(bin_net_switch)
+include mk/subdir_post.mk

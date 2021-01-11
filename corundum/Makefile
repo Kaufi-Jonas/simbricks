@@ -1,52 +1,37 @@
-CXXFLAGS = -Wall
-
-VERILATOR = verilator
-VFLAGS = +1364-2005ext+v \
-    -Wno-WIDTH -Wno-PINMISSING -Wno-LITENDIAN -Wno-IMPLICIT -Wno-SELRANGE \
-    -Wno-CASEINCOMPLETE -Wno-UNSIGNED
-
-SRCS = corundum_verilator.cpp dma.cpp mem.cpp
+include mk/subdir_pre.mk
 
 
-mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
-BASEDIR := $(abspath $(dir $(mkfile_path))/../)
+dir_corundum := $(d)
+bin_corundum := $(d)corundum_verilator
+verilator_dir_corundum := $(d)obj_dir
+verilator_src_corundum := $(verilator_dir_corundum)/Vinterface.cpp
+verilator_bin_corundum := $(verilator_dir_corundum)/Vinterface
 
-all: corundum_verilator
+vsrcs_corundum := $(wildcard $(d)rtl/*.v $(d)lib/*/rtl/*.v \
+    $(d)lib/*/lib/*/rtl/*.v)
+srcs_corundum := $(addprefix $(d),corundum_verilator.cpp dma.cpp mem.cpp)
+OBJS := $(srcs_corundum:.cpp=.o)
 
-obj_dir/Vinterface.cpp: rtl/interface.v
+$(OBJS): CPPFLAGS := $(CPPFLAGS) -I$(d)include/ -I$(lib_proto_inc) \
+    -I$(lib_nicbm_inc) -I$(lib_nicsim_inc)
+
+$(verilator_src_corundum): $(vsrcs_corundum)
 	$(VERILATOR) $(VFLAGS) --cc -O3 \
-	    -CFLAGS "-I$(BASEDIR)/nicsim_common/include -I$(BASEDIR)/proto -O3 -g -Wall" \
-	    -y rtl \
-	    -y lib/axi/rtl \
-	    -y lib/eth/lib/axis/rtl/ \
-	    -y ./lib/pcie/rtl \
-	    rtl/interface.v --exe $(SRCS) "$(BASEDIR)/nicsim_common/libnicsim_common.a"
+	    -CFLAGS "-I$(abspath $(lib_nicsim_inc)) -I$(abspath $(lib_proto_inc)) -O3 -g -Wall" \
+	    --Mdir $(verilator_dir_corundum) \
+	    -y $(dir_corundum)rtl \
+	    -y $(dir_corundum)lib/axi/rtl \
+	    -y $(dir_corundum)lib/eth/lib/axis/rtl/ \
+	    -y $(dir_corundum)lib/pcie/rtl \
+	    $(dir_corundum)rtl/interface.v --exe $(abspath $(srcs_corundum)) $(abspath $(lib_nicsim))
 
-obj_dir/Vinterface: obj_dir/Vinterface.cpp $(SRCS)
-	 $(MAKE) -C obj_dir -f Vinterface.mk
+$(verilator_bin_corundum): $(verilator_src_corundum) $(srcs_corundum) \
+    $(lib_nicsim)
+	$(MAKE) -C $(verilator_dir_corundum) -f Vinterface.mk
 
-corundum_verilator: obj_dir/Vinterface
+$(bin_corundum): $(verilator_bin_corundum)
 	cp $< $@
 
-#obj_dir/%.o: CXXFLAGS += -Wno-all
-#obj_dir/%.o: CPPFLAGS += -I /usr/share/verilator/include/
-#
-#obj_dir/verilated.o: /usr/share/verilator/include/verilated.cpp
-#	$(CXX) $(CXXFLAGS) -c $< -o $@
-#
-#obj_dir/verilated_vcd_c.o: /usr/share/verilator/include/verilated_vcd_c.cpp
-#	$(CXX) $(CXXFLAGS) -c $< -o $@
-#
-#corundum_verilator: corundum_verilator.o obj_dir/verilated.o \
-#	    obj_dir/verilated_vcd_c.o obj_dir/Vinterface.o \
-#	    obj_dir/Vinterface__Syms.o obj_dir/Vinterface__Trace.o \
-#	    obj_dir/Vinterface__Trace__Slow.o
-#	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^ $(LDLIBS)
-
-lightclean:
-	rm -f obj_dir/Vinterface corundum_verilator \
-	    obj_dir/corundum_verilator.o obj_dir/mem.o obj_dir/dma.o
-clean:
-	rm -rf obj_dir corundum_verilator *.o
-
-.PHONY: all clean lightclean
+CLEAN := $(bin_corundum) $(verilator_dir_corundum) $(OBJS)
+ALL := $(bin_corundum)
+include mk/subdir_post.mk

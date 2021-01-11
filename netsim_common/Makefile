@@ -1,10 +1,13 @@
-CPPFLAGS += -I include/ -I../proto/
-CFLAGS += -Wall -Wextra -Wno-unused-parameter -O3 -fPIC
+include mk/subdir_pre.mk
 
-all: libnetsim_common.a
+lib_netsim := $(d)libnetsim_common.a
+lib_netsim_inc := $(d)include/
 
-libnetsim_common.a: netsim.o utils.o
-	$(AR) rcs $@ $^
+OBJS := $(addprefix $(d),netsim.o utils.o)
 
-clean:
-	rm -rf libnetsim_common.a *.o
+$(OBJS): CPPFLAGS := $(CPPFLAGS) -I$(lib_netsim_inc) -I$(lib_proto_inc)
+
+$(lib_netsim): $(OBJS)
+
+CLEAN := $(lib_netsim) $(OBJS)
+include mk/subdir_post.mk

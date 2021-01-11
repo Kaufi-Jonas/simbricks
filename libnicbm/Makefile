@@ -1,13 +1,14 @@
-CPPFLAGS += -I include/ -I../proto/ -I../nicsim_common/include/
-CPPFLAGS += -I../libnicbm/include/
-CXXFLAGS += -Wall -Wextra -Wno-unused-parameter -O3
+include mk/subdir_pre.mk
 
-OBJS := nicbm.o
+lib_nicbm := $(d)libnicbm.a
+lib_nicbm_inc := $(d)include/
 
-all: libnicbm.a
+OBJS := $(addprefix $(d),nicbm.o)
 
-libnicbm.a: $(OBJS)
-	$(AR) rcs $@ $^
+$(OBJS): CPPFLAGS := $(CPPFLAGS) -I$(lib_nicbm_inc) -I$(lib_proto_inc) \
+    -I$(lib_nicsim_inc)
 
-clean:
-	rm -rf libnicbm.a $(OBJS)
+$(lib_nicbm): $(OBJS)
+
+CLEAN := $(lib_nicbm) $(OBJS)
+include mk/subdir_post.mk

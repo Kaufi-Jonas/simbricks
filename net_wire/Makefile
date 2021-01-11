@@ -1,10 +1,14 @@
-CPPFLAGS += -I../proto -I../netsim_common/include
-CFLAGS += -Wall -Wextra -Wno-unused-parameter -O3
-LDLIBS += -lpcap
+include mk/subdir_pre.mk
 
-net_wire: net_wire.o ../netsim_common/libnetsim_common.a
+bin_net_wire := $(d)net_wire
 
-all: net_wire
+OBJS := $(d)net_wire.o
 
-clean:
-	rm -f *.o net_wire
+$(OBJS): CPPFLAGS := $(CPPFLAGS) -I$(d)include/ -I$(lib_proto_inc) \
+    -I$(lib_netsim_inc)
+
+$(bin_net_wire): $(OBJS) $(lib_netsim) -lpcap
+
+CLEAN := $(bin_net_wire) $(OBJS)
+ALL := $(bin_net_wire)
+include mk/subdir_post.mk

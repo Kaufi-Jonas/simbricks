@@ -1,16 +1,18 @@
-CPPFLAGS += -I../nicsim_common/include -I../netsim_common/include -I../proto
-CPPFLAGS += -I../libnicbm/include/
-CFLAGS += -Wall -Wextra -Wno-unused-parameter -O3
+include mk/subdir_pre.mk
 
-all: corundum_bm tester
+bin_corundum_bm := $(d)corundum_bm
+bin_corundum_bm_tester := $(d)tester
 
-corundum.o: corundum.cc
-	g++ $(CFLAGS) $(CPPFLAGS) -c -o $@ $<
+objs_corundum_bm := $(d)corundum_bm.o
+objs_corundum_bm_tester := $(d)tester.o
+OBJS := $(objs_corundum_bm) $(objs_corundum_bm_tester)
 
-corundum_bm: corundum_bm.o ../libnicbm/libnicbm.a ../nicsim_common/libnicsim_common.a
-	g++ $^ -o $@
+$(OBJS): CPPFLAGS := $(CPPFLAGS) -I$(d)include/ -I$(lib_proto_inc) \
+    -I$(lib_nicbm_inc) -I$(lib_nicsim_inc)
 
-tester: tester.o ../libnicbm/libnicbm.a ../nicsim_common/libnicsim_common.a
+$(bin_corundum_bm): $(objs_corundum_bm) $(lib_nicbm) $(lib_nicsim)
+$(bin_corundum_bm_tester): $(objs_corundum_bm_tester) $(lib_nicbm) $(lib_nicsim)
 
-clean:
-	rm -f *.o corundum_bm tester
+CLEAN := $(bin_corundum_bm) $(bin_corundum_bm_tester) $(OBJS)
+ALL := $(bin_corundum_bm)
+include mk/subdir_post.mk

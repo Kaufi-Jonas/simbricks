@@ -1,15 +1,15 @@
-CPPFLAGS += -I../nicsim_common/include -I../proto
-CPPFLAGS += -I../libnicbm/include/
-CXXFLAGS += -Wall -Wextra -Wno-unused-parameter -O3 -g
-LDFLGAS = -g
+include mk/subdir_pre.mk
 
-OBJS := i40e_bm.o i40e_queues.o i40e_adminq.o i40e_hmc.o i40e_lan.o xsums.o \
-    rss.o logger.o
+bin_i40e_bm := $(d)i40e_bm
 
-all: i40e_bm
+OBJS := $(addprefix $(d),i40e_bm.o i40e_queues.o i40e_adminq.o i40e_hmc.o \
+    i40e_lan.o xsums.o rss.o logger.o)
 
-i40e_bm: $(OBJS) ../libnicbm/libnicbm.a ../nicsim_common/libnicsim_common.a
-i40e_bm: CC=$(CXX)
+$(OBJS): CPPFLAGS := $(CPPFLAGS) -I$(d)include/ -I$(lib_proto_inc) \
+    -I$(lib_nicbm_inc) -I$(lib_nicsim_inc)
 
-clean:
-	rm -f *.o i40e_bm
+$(bin_i40e_bm): $(OBJS) $(lib_nicbm) $(lib_nicsim)
+
+CLEAN := $(bin_i40e_bm) $(OBJS)
+ALL := $(bin_i40e_bm)
+include mk/subdir_post.mk
