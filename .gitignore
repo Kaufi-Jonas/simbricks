@@ -9,6 +9,8 @@ _vimrc_local.vim
 dummy_nic/dummy_nic
 corundum/obj_dir
 corundum/corundum_verilator
+doc/doxygen
+doc/_build
 net_wire/net_wire
 net_tap/net_tap
 net_switch/net_switch
