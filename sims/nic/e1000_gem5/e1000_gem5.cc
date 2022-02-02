@@ -22,7 +22,7 @@ void IGbE::SetupIntro(struct SimbricksProtoPcieDevIntro &di)
   di.bars[0].flags = SIMBRICKS_PROTO_PCIE_BAR_64;
 
   di.pci_vendor_id = 0x8086;
-  di.pci_device_id = 0x1075;
+  di.pci_device_id = 0x10C9;
   di.pci_class = 0x02;
   di.pci_subclass = 0x00;
   di.pci_revision = 0x01;
@@ -203,8 +203,8 @@ int main(int argc, char *argv[])
     params.pio_delay = 0; // TODO
     params.rx_desc_cache_size = 64;
     params.tx_desc_cache_size = 64;
-    params.phy_pid = 0x02A8;
-    params.phy_epid = 0x0380;
+    params.phy_pid = 0x0141;
+    params.phy_epid = 0x0CC0;
 
     IGbE *dev = new IGbE(&params);
 
