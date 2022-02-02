@@ -29,16 +29,21 @@ e = exp.Experiment('gem5-e1-pair')
 net = sim.SwitchNet()
 e.add_network(net)
 
-servers = sim.create_basic_hosts(e, 1, 'server', net, sim.E1000NIC, sim.Gem5Host, node.E1000LinuxNode, node.IperfTCPServer)
+servers = sim.create_basic_hosts(e, 1, 'server', net, sim.E1000NIC, sim.Gem5Host, node.E1000LinuxNode, node.IperfUDPServer)
 #servers = sim.create_basic_hosts(e, 1, 'server', net, sim.E1000NIC, sim.QemuHost, node.E1000LinuxNode, node.IperfTCPServer)
 
-clients = sim.create_basic_hosts(e, 1, 'client', net, sim.E1000NIC, sim.Gem5Host, node.E1000LinuxNode, node.IperfTCPClient, ip_start = 2)
+clients = sim.create_basic_hosts(e, 1, 'client', net, sim.E1000NIC, sim.Gem5Host, node.E1000LinuxNode, node.IperfUDPClient, ip_start = 2)
 
 #clients = sim.create_basic_hosts(e, 1, 'client', net, sim.E1000NIC, sim.QemuHost, node.E1000LinuxNode, node.IperfTCPClient, ip_start = 2)
 
 for c in clients:
     c.wait = True
     c.node_config.app.server_ip = servers[0].node_config.ip
-e.checkpoint = True
+    c.node_config.app.rate = '1000m'
+    c.node_config.ifnum = 3
+
+servers[0].node_config.ifnum = 2
+
+e.checkpoint = False
 experiments = [e]
 

@@ -63,7 +63,7 @@ class HostSim(Simulator):
     name = ''
     wait = False
     sleep = 0
-    cpu_freq = '8GHz'
+    cpu_freq = '3GHz'
 
     sync_mode = 0
     sync_period = 500
@@ -291,6 +291,7 @@ class Gem5Host(HostSim):
             cpu_type = self.cpu_type_cp
 
         cmd = (f'{env.gem5_path} --outdir={env.gem5_outdir(self)} '
+        '--debug-flags=Ethernet,DMA,PciDevice --debug-start=1276516223792 '
             f'{env.gem5_py_path} --caches --l2cache --l3cache '
             '--l1d_size=32kB --l1i_size=32kB --l2_size=2MB --l3_size=32MB '
             '--l1d_assoc=8 --l1i_assoc=8 --l2_assoc=4 --l3_assoc=16 '
@@ -328,6 +329,8 @@ class Gem5Host(HostSim):
                 cmd += '--simbricks-type=i40e '
             elif isinstance(dev, FEMUDev):
                 cmd += '--simbricks-type=femu '
+            elif isinstance(dev, E1000NIC):
+                cmd += '--simbricks-type=e1000'
         return cmd
 
 
@@ -541,7 +544,7 @@ class OmnetSwitch(NetSim):
         #for (_,n) in self.connect_sockets(env):
         #    ports += '--CosimPort=' + n + ' '
 
-        cmd = 'opp_run -u Cmdenv -m -n /OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/src:/OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/examples/:/OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/tutorials/:/OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/showcases/ --image-path=/OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/images --cmdenv-express-mode=false -l /OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/src/INET -f /OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/examples/ethernet/simbricks/omnetpp.ini'
+        cmd = 'opp_run -u Cmdenv -m -n /OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/src:/OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/examples/:/OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/tutorials/:/OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/showcases/ --image-path=/OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/images --cmdenv-express-mode=false -l /OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/src/INET -c twoHostoneSwitch -f /OS/endhost-networking/work/sim/hejing/omnetpp-5.7/samples/inet4/examples/ethernet/simbricks/omnetpp.ini --simtime-resolution=-12 '
         print(cmd)
 
         return cmd

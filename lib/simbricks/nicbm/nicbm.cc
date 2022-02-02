@@ -41,7 +41,7 @@ extern "C" {
 #include <simbricks/proto/base.h>
 }
 
-//#define DEBUG_NICBM 1
+#define DEBUG_NICBM 1
 #define STAT_NICBM 1
 #define DMA_MAX_PENDING 64
 
@@ -125,7 +125,7 @@ void Runner::IssueDma(DMAOp &op) {
   if (dma_pending_ < DMA_MAX_PENDING) {
     // can directly issue
 #ifdef DEBUG_NICBM
-    printf("nicbm: issuing dma op %p addr %lx len %zu pending %zu\n", &op,
+    printf("[main_time = %lu] nicbm: issuing dma op %p addr %lx len %zu pending %zu\n", main_time_, &op,
            op.dma_addr_, op.len_, dma_pending_);
 #endif
     DmaDo(op);
@@ -152,7 +152,7 @@ void Runner::DmaDo(DMAOp &op) {
   volatile union SimbricksProtoPcieD2H *msg = D2HAlloc();
   dma_pending_++;
 #ifdef DEBUG_NICBM
-  printf("nicbm: executing dma op %p addr %lx len %zu pending %zu\n", &op,
+  printf("[main_time = %lu] nicbm: executing dma op %p addr %lx len %zu pending %zu\n", main_time_, &op,
          op.dma_addr_, op.len_, dma_pending_);
 #endif
 
@@ -208,7 +208,7 @@ void Runner::DmaDo(DMAOp &op) {
 void Runner::MsiIssue(uint8_t vec) {
   volatile union SimbricksProtoPcieD2H *msg = D2HAlloc();
 #ifdef DEBUG_NICBM
-  printf("nicbm: issue MSI interrupt vec %u\n", vec);
+  printf("[main_time = %lu] nicbm: issue MSI interrupt vec %u\n", main_time_, vec);
 #endif
   volatile struct SimbricksProtoPcieD2HInterrupt *intr = &msg->interrupt;
   intr->vector = vec;
@@ -222,7 +222,7 @@ void Runner::MsiIssue(uint8_t vec) {
 void Runner::MsiXIssue(uint8_t vec) {
   volatile union SimbricksProtoPcieD2H *msg = D2HAlloc();
 #ifdef DEBUG_NICBM
-  printf("nicbm: issue MSI-X interrupt vec %u\n", vec);
+  printf("[main_time = %lu] nicbm: issue MSI-X interrupt vec %u\n", main_time_, vec);
 #endif
   volatile struct SimbricksProtoPcieD2HInterrupt *intr = &msg->interrupt;
   intr->vector = vec;
@@ -236,7 +236,7 @@ void Runner::MsiXIssue(uint8_t vec) {
 void Runner::IntXIssue(bool level) {
   volatile union SimbricksProtoPcieD2H *msg = D2HAlloc();
 #ifdef DEBUG_NICBM
-  printf("nicbm: set intx interrupt %u\n", level);
+  printf("[main_time = %lu] nicbm: set intx interrupt %u\n", main_time_, level);
 #endif
   volatile struct SimbricksProtoPcieD2HInterrupt *intr = &msg->interrupt;
   intr->vector = 0;
@@ -269,7 +269,7 @@ void Runner::H2DRead(volatile struct SimbricksProtoPcieH2DRead *read) {
 #ifdef DEBUG_NICBM
   uint64_t dbg_val = 0;
   memcpy(&dbg_val, (const void *)rc->data, read->len <= 8 ? read->len : 8);
-  printf("nicbm: read(off=0x%lx, len=%u, val=0x%lx)\n", read->offset, read->len,
+  printf("[main_time = %lu] nicbm: read(off=0x%lx, len=%u, val=0x%lx)\n", main_time_, read->offset, read->len,
          dbg_val);
 #endif
 
@@ -288,7 +288,7 @@ void Runner::H2DWrite(volatile struct SimbricksProtoPcieH2DWrite *write) {
 #ifdef DEBUG_NICBM
   uint64_t dbg_val = 0;
   memcpy(&dbg_val, (const void *)write->data, write->len <= 8 ? write->len : 8);
-  printf("nicbm: write(off=0x%lx, len=%u, val=0x%lx)\n", write->offset,
+  printf("[main_time = %lu] nicbm: write(off=0x%lx, len=%u, val=0x%lx)\n",  main_time_,write->offset,
          write->len, dbg_val);
 #endif
   dev_.RegWrite(write->bar, write->offset, (void *)write->data, write->len);
@@ -303,7 +303,7 @@ void Runner::H2DReadcomp(volatile struct SimbricksProtoPcieH2DReadcomp *rc) {
   DMAOp *op = (DMAOp *)(uintptr_t)rc->req_id;
 
 #ifdef DEBUG_NICBM
-  printf("nicbm: completed dma read op %p addr %lx len %zu\n", op, op->dma_addr_,
+  printf("[main_time = %lu] nicbm: completed dma read op %p addr %lx len %zu\n",  main_time_, op, op->dma_addr_,
          op->len_);
 #endif
 
@@ -318,7 +318,7 @@ void Runner::H2DWritecomp(volatile struct SimbricksProtoPcieH2DWritecomp *wc) {
   DMAOp *op = (DMAOp *)(uintptr_t)wc->req_id;
 
 #ifdef DEBUG_NICBM
-  printf("nicbm: completed dma write op %p addr %lx len %zu\n", op,
+  printf("[main_time = %lu] nicbm: completed dma write op %p addr %lx len %zu\n",  main_time_, op,
          op->dma_addr_, op->len_);
 #endif
 

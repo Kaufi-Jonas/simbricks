@@ -39,7 +39,8 @@ class NodeConfig(object):
             cp_es = []
             exit_es = ['poweroff -f']
         else:
-            cp_es = ['m5 checkpoint']
+            cp_es = []
+            #cp_es = ['m5 checkpoint']
             exit_es = ['m5 exit']
 
         es = self.prepare_pre_cp() + self.app.prepare_pre_cp() + cp_es + \
@@ -116,7 +117,7 @@ class AppConfig(object):
 
 class LinuxNode(NodeConfig):
     ifname = 'eth0'
-
+    ifnum = 1
     def __init__(self):
         self.drivers = []
 
@@ -127,6 +128,7 @@ class LinuxNode(NodeConfig):
                 l.append('insmod ' + d)
             else:
                 l.append('modprobe ' + d)
+        l.append('ip link set dev ' + self.ifname + 'address 00:90:00:00:00:0%d' % (self.ifnum))
         l.append('ip link set dev ' + self.ifname + ' up')
         l.append('ip addr add %s/%d dev %s' %
                 (self.ip, self.prefix, self.ifname))
@@ -367,7 +369,7 @@ class IperfUDPClient(AppConfig):
         if self.is_last:
             cmds.append('sleep 0.5')
         else:
-            cmds.append('sleep 10')
+            cmds.append('sleep 5')
 
         return cmds
 
