@@ -23,11 +23,10 @@
 import asyncio
 import pathlib
 
+import simbricks.experiments as exp
 import simbricks.proxy as proxy
 from simbricks.exectools import Executor
 from simbricks.runtime.common import *
-
-import simbricks.experiments as exp
 
 
 class DistributedSimpleRuntime(Runtime):

@@ -25,9 +25,8 @@ import pathlib
 import typing as tp
 
 import simbricks.exectools as exectools
-from simbricks.runtime.common import *
-
 import simbricks.experiments as exp
+from simbricks.runtime.common import *
 
 
 class LocalSimpleRuntime(Runtime):

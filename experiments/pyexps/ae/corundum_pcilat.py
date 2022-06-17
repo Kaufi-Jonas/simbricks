@@ -34,11 +34,10 @@
 # $: python3 run.py pyexps/ae/corundum_pcilat.py --filter cblat-gt-sw --verbose --force
 ########################################################################
 
+import simbricks.experiments as exp
 import simbricks.nodeconfig as node
 import simbricks.simulators as sim
 from simbricks.simulator_utils import create_basic_hosts
-
-import simbricks.experiments as exp
 
 pci_latency = [1000]
 experiments = []

@@ -31,9 +31,8 @@ import sys
 import typing as tp
 
 import simbricks.exectools as exectools
-import simbricks.runtime as runtime
-
 import simbricks.experiments as exp
+import simbricks.runtime as runtime
 
 
 def mkdir_if_not_exists(path):
