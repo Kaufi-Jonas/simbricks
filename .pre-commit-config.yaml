@@ -45,7 +45,7 @@ repos:
     -   id: pytype
         name: pytype
         entry: pytype
-        language: python
+        language: system
         types: [python]
         pass_filenames: false
         args: [--config=.pytype.cfg, experiments/]
