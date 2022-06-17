@@ -155,4 +155,3 @@ void mqnic_arm_cq(struct mqnic_cq_ring *ring)
 {
     iowrite32(ring->eq_index | MQNIC_CPL_QUEUE_ARM_MASK, ring->hw_addr+MQNIC_CPL_QUEUE_INTERRUPT_INDEX_REG);
 }
-

@@ -49,7 +49,7 @@ Optional arguments
    *  `` -h, --help``
 
       show this help message and exit.
-   
+
    * `` --filter PATTERN [PATTERN ...] ``
       Pattern to match experiment names against
 

@@ -15,7 +15,7 @@ intelligent bus cosimulation endpoints.
 ### arbiter module
 
 General-purpose parametrizable arbiter.  Supports priority and round-robin
-arbitration.  Supports blocking until request release or acknowledge.  
+arbitration.  Supports blocking until request release or acknowledge.
 
 ### axis_adapter module
 
@@ -64,7 +64,7 @@ Configurable zero insertion.
 ### axis_crosspoint module
 
 Basic crosspoint switch.  tready signal not supported.  Parametrizable data
-width.  
+width.
 
 Wrappers can generated with axis_crosspoint_wrap.py.
 

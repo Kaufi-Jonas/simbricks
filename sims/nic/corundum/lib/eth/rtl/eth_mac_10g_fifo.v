@@ -245,7 +245,7 @@ end
 generate
 
 if (TX_PTP_TS_ENABLE) begin
-    
+
     ptp_clock_cdc #(
         .TS_WIDTH(PTP_TS_WIDTH),
         .NS_WIDTH(4),
@@ -346,7 +346,7 @@ if (TX_PTP_TS_ENABLE) begin
             .m_status_bad_frame(),
             .m_status_good_frame()
         );
-        
+
     end else begin
 
         assign tx_axis_tdata_int = tx_axis_tdata;
@@ -406,7 +406,7 @@ if (TX_PTP_TS_ENABLE) begin
     end
 
 end else begin
-    
+
     assign s_axis_tx_ptp_ts_ready = 1'b0;
 
     assign m_axis_tx_ptp_ts_96 = {PTP_TS_WIDTH{1'b0}};

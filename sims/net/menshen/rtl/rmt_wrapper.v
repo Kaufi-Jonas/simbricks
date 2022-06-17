@@ -23,7 +23,7 @@ module rmt_wrapper #(
 )
 (
 	input										clk,		// axis clk
-	input										aresetn,	
+	input										aresetn,
 	input [31:0]								vlan_drop_flags,
 	output reg [31:0]								ctrl_token,
 
@@ -47,7 +47,7 @@ module rmt_wrapper #(
 	input										m_axis_tready,
 	output  									m_axis_tlast
 
-	
+
 );
 
 reg [31:0] vlan_drop_flags_r;
@@ -230,11 +230,11 @@ wire [C_NUM_QUEUES-1:0]				pkt_fifo_nearly_full;
 wire [C_NUM_QUEUES-1:0]				pkt_fifo_empty;
 
 /*
-generate 
+generate
 	genvar i;
 	for (i=0; i<C_NUM_QUEUES; i=i+1) begin:
 		sub_pkt_fifo
-		fifo_generator_705b 
+		fifo_generator_705b
 		pkt_fifo (
 			.clk			(clk),                  // input wire clk
   			.srst			(~aresetn),                // input wire srst
@@ -256,7 +256,7 @@ generate
 	end
 endgenerate
 */
-generate 
+generate
 	genvar i;
 	for (i=0; i<C_NUM_QUEUES; i=i+1) begin:
 		sub_pkt_fifo
@@ -310,7 +310,7 @@ assign s_axis_tready_f = (!pkt_fifo_nearly_full[0] ||
 							!phv_fifo_nearly_full[3]);
 
 
-generate 
+generate
 	for (i=0; i<C_NUM_QUEUES; i=i+1) begin:
 		sub_phv_fifo_1
 		fallthrough_small_fifo #(
@@ -329,7 +329,7 @@ generate
 			.empty			(phv_fifo_empty[i])
 		);
 		/*
-		fifo_generator_512b 
+		fifo_generator_512b
 		phv_fifo_1 (
 		  .clk				(clk),                  // input wire clk
 		  .srst				(~aresetn),                // input wire srst
@@ -364,7 +364,7 @@ generate
 			.empty			()
 		);
 		/*
-		fifo_generator_512b 
+		fifo_generator_512b
 		phv_fifo_2 (
 		  .clk				(clk),                  // input wire clk
 		  .srst				(~aresetn),                // input wire srst
@@ -479,7 +479,7 @@ phv_parser
 	.out_vlan			(stg0_vlan_in),
 	.out_vlan_valid		(stg0_vlan_valid_in),
 	.out_vlan_ready		(stg0_vlan_ready),
-	// 
+	//
 	.stg_ready_in		(stg0_ready),
 
 	// output to different pkt fifos
@@ -766,7 +766,7 @@ generate
 		phv_deparser (
 			.axis_clk				(clk),
 			.aresetn				(aresetn),
-		
+
 			//data plane
 			.pkt_fifo_tdata			(pkt_fifo_tdata_out[i]),
 			.pkt_fifo_tkeep			(pkt_fifo_tkeep_out[i]),
@@ -775,7 +775,7 @@ generate
 			.pkt_fifo_empty			(pkt_fifo_empty[i]),
 			// output from STAGE
 			.pkt_fifo_rd_en			(pkt_fifo_rd_en[i]),
-		
+
 			.phv_fifo_out			(phv_fifo_out[i]),
 			.phv_fifo_empty			(phv_fifo_empty[i]),
 			.phv_fifo_rd_en			(phv_fifo_rd_en[i]),
@@ -787,7 +787,7 @@ generate
 			.depar_out_tlast		(depar_out_tlast[i]),
 			// input
 			.depar_out_tready		(depar_out_tready[i]),
-		
+
 			//control path
 			.ctrl_s_axis_tdata(ctrl_s_axis_tdata_7_r),
 			.ctrl_s_axis_tuser(ctrl_s_axis_tuser_7_r),

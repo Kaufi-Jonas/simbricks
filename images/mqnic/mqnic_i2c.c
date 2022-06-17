@@ -148,5 +148,3 @@ void mqnic_remove_i2c(struct mqnic_dev *mqnic)
 
     memset(&mqnic->eeprom_i2c_adap, 0, sizeof(mqnic->eeprom_i2c_adap));
 }
-
-

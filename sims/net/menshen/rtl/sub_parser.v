@@ -37,7 +37,7 @@ always @(*) begin
 	if (parse_act_valid) begin
 		val_out_valid_nxt = 1;
 		val_out_seq_nxt = parse_act[3:1];
-		
+
 		case({parse_act[5:4], parse_act[0]})
 			// 2B
 			3'b011: begin

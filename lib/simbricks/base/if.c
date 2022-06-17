@@ -526,7 +526,7 @@ int SimbricksBaseIfIntroSend(struct SimbricksBaseIf *base_if,
   } else if (ret != (ssize_t) (iov[0].iov_len + iov[1].iov_len)) {
     fprintf(stderr, "SimbricksBaseIfIntroSend: sendmsg was short, "
                     "currently unsupported\n");
-    return -1;  
+    return -1;
   }
 
   if (base_if->conn_state == kConnAwaitHandshakeTx) {
@@ -557,7 +557,7 @@ int SimbricksBaseIfIntroRecv(struct SimbricksBaseIf *base_if,
   struct iovec iov;
   iov.iov_base = intro_buf;
   iov.iov_len = sizeof(intro_buf);
-  
+
   struct cmsghdr *cmsg;
   union {
     char buf[CMSG_SPACE(sizeof(int))];
@@ -647,7 +647,7 @@ int SimbricksBaseIfIntroRecv(struct SimbricksBaseIf *base_if,
   }
   memcpy(payload, intro_buf + upper_off, upper_layer_len);
   *payload_len = upper_layer_len;
-  
+
 
   if (!base_if->listener) {
     // handle shm setup

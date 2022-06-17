@@ -624,7 +624,7 @@ always @* begin
     store_axi_w_int_to_output = 1'b0;
     store_axi_w_int_to_temp = 1'b0;
     store_axi_w_temp_to_output = 1'b0;
-    
+
     if (m_axi_wready_int_reg) begin
         // input is ready
         if (m_axi_wready || !m_axi_wvalid_reg) begin

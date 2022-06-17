@@ -421,4 +421,3 @@ int mqnic_poll_rx_cq(struct napi_struct *napi, int budget)
 
     return done;
 }
-

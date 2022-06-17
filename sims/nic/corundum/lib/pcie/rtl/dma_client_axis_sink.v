@@ -459,7 +459,7 @@ for (n = 0; n < SEG_COUNT; n = n + 1) begin
         store_axi_w_int_to_output = 1'b0;
         store_axi_w_int_to_temp = 1'b0;
         store_axi_w_temp_to_output = 1'b0;
-        
+
         if (ram_wr_cmd_ready_int_reg[n +: 1]) begin
             // input is ready
             if (ram_wr_cmd_ready[n +: 1] || !ram_wr_cmd_valid_reg) begin

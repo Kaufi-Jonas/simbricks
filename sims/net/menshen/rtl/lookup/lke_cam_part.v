@@ -162,7 +162,7 @@ reg                 c_wr_en_cam; //enable table write(wena)
 
 reg  [7:0]          c_index_act;
 reg                 c_wr_en_act;
-reg  [ACT_LEN-1:0]  act_entry_tmp;             
+reg  [ACT_LEN-1:0]  act_entry_tmp;
 reg                 continous_flag;
 reg [204:0]         cam_entry_reg;
 
@@ -183,7 +183,7 @@ localparam IDLE_C = 0,
            ACT_TMP_ENTRY = 6,
 		   FLUSH_REST_C = 7;
 
-generate 
+generate
     if(C_S_AXIS_DATA_WIDTH == 512) begin
         assign mod_id = c_s_axis_tdata[368+:8];
         assign resv   = c_s_axis_tdata[376+:4];
@@ -282,7 +282,7 @@ generate
                 case(c_state)
                     IDLE_C: begin
                         if(c_s_axis_tvalid) begin
-                            if(mod_id[7:3] == STAGE_ID && mod_id[2:0] == LOOKUP_ID 
+                            if(mod_id[7:3] == STAGE_ID && mod_id[2:0] == LOOKUP_ID
 									&& control_flag == 16'hf2f1
 									&& resv == 4'b0) begin // TCAM entry
                                 c_wr_en_cam <= 1'b0;
@@ -368,7 +368,7 @@ generate
 
 		if (STAGE_ID == 4) begin
 			// tcam1 for lookup
-        	cam_top # ( 
+        	cam_top # (
         	    .C_DEPTH			(16),
         	    // .C_WIDTH			(256),
         	    .C_WIDTH			(205),
@@ -387,7 +387,7 @@ generate
 
         	    //.WE				(lookup_din_en),
         	    //.WR_ADDR			(lookup_din_addr),
-        	    //.DATA_MASK		(lookup_din_mask),  
+        	    //.DATA_MASK		(lookup_din_mask),
         	    //.DIN				(lookup_din),
 
         	    .WE                 (c_wr_en_cam),
@@ -399,7 +399,7 @@ generate
 		end
 		else begin
 			// tcam1 for lookup
-        	cam_top # ( 
+        	cam_top # (
         	    .C_DEPTH			(16),
         	    // .C_WIDTH			(256),
         	    .C_WIDTH			(205),
@@ -418,7 +418,7 @@ generate
 
         	    //.WE				(lookup_din_en),
         	    //.WR_ADDR			(lookup_din_addr),
-        	    //.DATA_MASK		(lookup_din_mask),  
+        	    //.DATA_MASK		(lookup_din_mask),
         	    //.DIN				(lookup_din),
 
         	    .WE                 (c_wr_en_cam),
@@ -468,7 +468,7 @@ generate
         assign mod_id = c_s_axis_tdata[112+:8];
         assign resv = c_s_axis_tdata[120+:4];
         assign control_flag = c_s_axis_tdata[64+:16];
-		// 
+		//
 		reg [2:0] c_state_next;
 		reg [C_S_AXIS_DATA_WIDTH-1:0]		r_tdata, c_s_axis_tdata_d1;
 		reg [C_S_AXIS_TUSER_WIDTH-1:0]		r_tuser, c_s_axis_tuser_d1;
@@ -509,7 +509,7 @@ generate
 			c_wr_cam_data_next = c_wr_cam_data;
 			c_wr_act_data_next = c_wr_act_data;
 
-			case (c_state) 
+			case (c_state)
 				IDLE_C: begin // 1st segment
 					r_tvalid = 0;
 					if (c_s_axis_tvalid) begin
@@ -524,7 +524,7 @@ generate
 					end
 				end
 				PARSE_C: begin // 2nd segment
-					if (mod_id[7:3] == STAGE_ID && mod_id[2:0] == LOOKUP_ID && 
+					if (mod_id[7:3] == STAGE_ID && mod_id[2:0] == LOOKUP_ID &&
 						control_flag == 16'hf2f1 && c_s_axis_tvalid && resv==4'b0) begin
 						// should not emit segment
 						c_index_cam_next = c_s_axis_tdata[128+:8];
@@ -546,7 +546,7 @@ generate
 					if (c_s_axis_tvalid) begin
 						c_wr_en_cam_next = 1; // next clk to write
 						c_wr_cam_data_next = c_s_axis_tdata_swapped[51+:205];
-						
+
 						c_state_next = IDLE_C;
 					end
 				end
@@ -625,7 +625,7 @@ generate
 				c_s_axis_tkeep_d1 <= c_s_axis_tkeep;
 				c_s_axis_tlast_d1 <= c_s_axis_tlast;
 				c_s_axis_tvalid_d1 <= c_s_axis_tvalid;
-				// 
+				//
 				r_1st_tdata <= r_1st_tdata_next;
 				r_1st_tkeep <= r_1st_tkeep_next;
 				r_1st_tuser <= r_1st_tuser_next;
@@ -636,7 +636,7 @@ generate
 
 		if (STAGE_ID == 4) begin
 			// tcam1 for lookup
-        	cam_top # ( 
+        	cam_top # (
         	    .C_DEPTH			(16),
         	    // .C_WIDTH			(256),
         	    .C_WIDTH			(205), // 192+1+12
@@ -657,7 +657,7 @@ generate
 
         	    //.WE				(lookup_din_en),
         	    //.WR_ADDR			(lookup_din_addr),
-        	    //.DATA_MASK		(lookup_din_mask),  
+        	    //.DATA_MASK		(lookup_din_mask),
         	    //.DIN				(lookup_din),
 
         	    .WE                 (c_wr_en_cam),
@@ -670,7 +670,7 @@ generate
 		end
 		else begin
 			// tcam1 for lookup
-        	cam_top # ( 
+        	cam_top # (
         	    .C_DEPTH			(16),
         	    // .C_WIDTH			(256),
         	    .C_WIDTH			(205), // 192+1+12
@@ -691,7 +691,7 @@ generate
 
         	    //.WE				(lookup_din_en),
         	    //.WR_ADDR			(lookup_din_addr),
-        	    //.DATA_MASK		(lookup_din_mask),  
+        	    //.DATA_MASK		(lookup_din_mask),
         	    //.DIN				(lookup_din),
 
         	    .WE                 (c_wr_en_cam),
@@ -707,4 +707,3 @@ generate
 endgenerate
 
 endmodule
-

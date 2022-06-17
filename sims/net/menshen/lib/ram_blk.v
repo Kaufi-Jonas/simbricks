@@ -18,7 +18,7 @@ module ram_blk #(
     reg [(DATA_BITS - 1):0] ram [(ADDR_BITS - 1):0];
     //reg [(ADDR_BITS - 1):0] read_addrb;
     reg [(DATA_BITS - 1):0] doutb_r;
- 
+
     always @(posedge clka) begin
         if (ena) begin
             if (wea)
@@ -28,8 +28,8 @@ module ram_blk #(
     end
 
     /*always @(posedge clkb) begin
-        if (enb)  
-            doutb_r <= ram[addrb];  
+        if (enb)
+            doutb_r <= ram[addrb];
     end
     assign doutb = doutb_r;
     */

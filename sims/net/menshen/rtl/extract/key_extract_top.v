@@ -69,7 +69,7 @@ always @(*) begin
 	key_offset_valid_next = 0;
 
 
-	case (bram_state) 
+	case (bram_state)
 		BRAM_IDLE: begin
 			if (vlan_in_valid) begin
 				bram_state_next = BRAM_CYCLE_1;
@@ -193,7 +193,7 @@ localparam IDLE_C = 0,
            SU_WRITE_MASK_C = 5,
 		   FLUSH_PKT_C = 6;
 
-generate 
+generate
     if(C_S_AXIS_DATA_WIDTH == 512) begin
         assign mod_id = c_s_axis_tdata[368+:8];
         //4'b0 for key offset
@@ -276,7 +276,7 @@ generate
                 c_wr_en_off <= 1'b0;
                 c_wr_en_mask <= 1'b0;
                 c_index <= 8'b0;
-        
+
                 c_m_axis_tdata <= 0;
                 c_m_axis_tuser <= 0;
                 c_m_axis_tkeep <= 0;
@@ -285,9 +285,9 @@ generate
 
                 key_off_entry_reg <= 0;
                 key_mask_entry_reg <= 0;
-        
+
                 c_state <= IDLE_C;
-        
+
             end
             else begin
                 case(c_state)
@@ -296,13 +296,13 @@ generate
                          control_flag == 16'hf2f1)begin
                             //c_wr_en <= 1'b1;
                             c_index <= c_s_axis_tdata[384+:8];
-        
+
                             c_m_axis_tdata <= 0;
                             c_m_axis_tuser <= 0;
                             c_m_axis_tkeep <= 0;
                             c_m_axis_tvalid <= 0;
                             c_m_axis_tlast <= 0;
-        
+
                             //c_state <= WRITE_C;
                             if(resv == 4'b0) begin
                                 c_wr_en_off <= 1'b0;
@@ -316,14 +316,14 @@ generate
                         else begin
                             c_wr_en_off <= 1'b0;
                             c_wr_en_mask <= 1'b0;
-                            c_index <= 8'b0; 
-        
+                            c_index <= 8'b0;
+
                             c_m_axis_tdata <= c_s_axis_tdata;
                             c_m_axis_tuser <= c_s_axis_tuser;
                             c_m_axis_tkeep <= c_s_axis_tkeep;
                             c_m_axis_tvalid <= c_s_axis_tvalid;
                             c_m_axis_tlast <= c_s_axis_tlast;
-        
+
                             c_state <= IDLE_C;
                         end
                     end
@@ -397,7 +397,7 @@ generate
                     default: begin
                         c_wr_en_off <= 1'b0;
                         c_wr_en_mask <= 1'b0;
-                        c_index <= 8'b0; 
+                        c_index <= 8'b0;
                         c_m_axis_tdata <= c_s_axis_tdata;
                         c_m_axis_tuser <= c_s_axis_tuser;
                         c_m_axis_tkeep <= c_s_axis_tkeep;
@@ -405,7 +405,7 @@ generate
                         c_m_axis_tlast <= c_s_axis_tlast;
                     end
                 endcase
-        
+
             end
         end
         //ram for key extract
@@ -648,7 +648,7 @@ generate
 				c_s_axis_tkeep_d1 <= c_s_axis_tkeep;
 				c_s_axis_tlast_d1 <= c_s_axis_tlast;
 				c_s_axis_tvalid_d1 <= c_s_axis_tvalid;
-				// 
+				//
 				r_1st_tdata <= r_1st_tdata_next;
 				r_1st_tkeep <= r_1st_tkeep_next;
 				r_1st_tuser <= r_1st_tuser_next;

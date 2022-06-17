@@ -32,10 +32,10 @@ module alu_1 #(
 */
 
 
-localparam IDLE_S=3'd0, 
-		   WAIT1_S=3'd1, 
-		   WAIT2_S=3'd2, 
-		   WAIT3_S=3'd3, 
+localparam IDLE_S=3'd0,
+		   WAIT1_S=3'd1,
+		   WAIT2_S=3'd2,
+		   WAIT3_S=3'd3,
 		   OUTPUT_S=3'd4;
 
 reg [2:0]					state, state_next;

@@ -119,4 +119,3 @@ void mqnic_port_set_rss_mask(struct mqnic_port *port, u32 rss_mask)
 {
     iowrite32(rss_mask, port->hw_addr+MQNIC_PORT_REG_RSS_MASK);
 }
-

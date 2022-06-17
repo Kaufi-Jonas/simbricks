@@ -171,7 +171,7 @@ void Runner::DmaDo(DMAOp &op) {
     write->offset = op.dma_addr_;
     write->len = op.len_;
     memcpy((void *)write->data, (void *)op.data_, op.len_);
-    
+
 #ifdef DEBUG_NICBM
     uint8_t *tmp = (uint8_t*)op.data_;
     int d;
@@ -441,7 +441,7 @@ void Runner::PollN2D() {
       if (stat_flag){
         s_n2d_poll_sync += 1;
       }
-#endif    
+#endif
       break;
 
     default:

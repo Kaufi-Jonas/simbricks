@@ -63,7 +63,7 @@ interface widths and master and slave interface counts.  Supports all burst
 types.  Fully nonblocking with completely separate read and write paths; ID
 based transaction ordering protection logic; and per-port address decode,
 admission control, and decode error handling.  Wrapper for axi_crossbar_rd and
-axi_crossbar_wr.  
+axi_crossbar_wr.
 
 ### axi_crossbar_addr module
 
@@ -332,7 +332,7 @@ registers can be individually bypassed.
 
 Write
 
-                ___     ___     ___     ___     ___    
+                ___     ___     ___     ___     ___
     clk     ___/   \___/   \___/   \___/   \___/   \___
                 _______
     awid    XXXX_ID____XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
@@ -370,7 +370,7 @@ Write
 
 Read
 
-                ___     ___     ___     ___     ___    
+                ___     ___     ___     ___     ___
     clk     ___/   \___/   \___/   \___/   \___/   \___
                 _______
     arid    XXXX_ID____XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

@@ -53,5 +53,3 @@ Before running TAS the following steps are necessary:
 .. code-block:: bash
 
    python3 run.py pyexps/netperf.py --filter nf-gem5-switch-i40e --runs=1 --verbose
-
-

@@ -23,12 +23,12 @@
 
 ###########################################################################
 # This script runs dctcp experiment in standalone ns-3
-# 
+#
 ##### build dctcp-cwnd-devred.cc example in ns-3
 ##### cp examples/tcp/dctcp-cwnd-devred.cc scratch/
 ##### ./waf
 
-##### ./ns3-dctcp.sh [num_core] 
+##### ./ns3-dctcp.sh [num_core]
 
 
 EHSIM_BASE="$(readlink -f $(dirname ${BASH_SOURCE[0]})/../../..)"
@@ -86,7 +86,7 @@ do
             pid=$!
             pids="$pids $pid"
             proc=$(($proc + 1))
-            
+
             if [ $proc -eq $cores ]; then
                 for p in $pids; do
                     wait $p
@@ -102,4 +102,3 @@ done
 for p in $pids; do
     wait $p
 done
-

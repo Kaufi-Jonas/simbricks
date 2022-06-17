@@ -417,7 +417,7 @@ always @(posedge clk) begin
         frame_ptr_reg <= frame_ptr_next;
 
         s_axis_tready_reg <= s_axis_tready_next;
-    
+
         m_axis_ptp_ts_valid_reg <= m_axis_ptp_ts_valid_next;
 
         gmii_tx_en_reg <= gmii_tx_en_next;

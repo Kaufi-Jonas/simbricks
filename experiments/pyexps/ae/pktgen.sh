@@ -109,11 +109,11 @@ run_switch_chain(){
 
     nswitch=0
     nums_dec=$(($2-1))
-    
+
     while [ $nswitch -lt $2 ]
     do
         pswitch=$(($nswitch-1))
-        #the first 
+        #the first
         if [ $nswitch -eq 0 ]
         then
             $SWITCH_EXE -S 500 -E 500 \
@@ -124,7 +124,7 @@ run_switch_chain(){
             SWITCH_PIDS="$SWITCH_PIDS $pid"
             sleep 1
         #the last
-        elif [ $nswitch -eq $nums_dec ]      
+        elif [ $nswitch -eq $nums_dec ]
         then
             $SWITCH_EXE -S 500 -E 500 \
             $args_1 -s $RUN_DIR/s${pswitch}eth > $RUN_DIR/switch_${nswitch}.log &
@@ -189,7 +189,7 @@ run_switch_tor(){
         args="$args -s $RUN_DIR/s.$iface"
         ((iface++))
     done
-    
+
     $SWITCH_EXE -S 500 -E 500 \
     $args > $RUN_DIR/log.rswitch &
 
@@ -203,22 +203,22 @@ run_switch_tor(){
 run_switch_hierarchy(){
     echo "Starting switch hierarchy"
     SWITCH_EXE=$SB_BASE/sims/net/switch/net_switch
-    
-    
+
+
     layer=1
     #leave switch
     iface=0
-    
+
     while [ $iface -lt $1 ]
     do
         $SWITCH_EXE -S 500 -E 500 \
         -h $RUN_DIR/s${layer}.$iface -s $RUN_DIR/eth.${iface}> $RUN_DIR/s${layer}.${iface}.log &
-            
+
         pid=$!
         ALL_PIDS="$ALL_PIDS $pid"
         SWITCH_PIDS="$SWITCH_PIDS $pid"
         ((iface++))
-    done 
+    done
 
     ((layer++))
     sleep 2
@@ -231,7 +231,7 @@ run_switch_hierarchy(){
         do
             $SWITCH_EXE -S 500 -E 500 \
             -s $RUN_DIR/s${layer_dec}.$iface -h  $RUN_DIR/s${layer}.$iface > $RUN_DIR/s${layer}.${iface}.log &
-            
+
             pid=$!
             ALL_PIDS="$ALL_PIDS $pid"
             SWITCH_PIDS="$SWITCH_PIDS $pid"
@@ -315,7 +315,7 @@ elif [ $3 == "run_switch" ]; then
     run_switch $1
 elif [ $3 == "run_switch_dumbbell" ]; then
     run_switch_dumbbell $1
-else    
+else
     echo "no argument match"
     cleanup
     exit 0

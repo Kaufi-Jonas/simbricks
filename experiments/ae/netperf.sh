@@ -13,11 +13,10 @@ then
 elif [ $1 == "all" ];
 then
     echo "Run all the combinations in Appendix 4, Table 3"
-    python3 run.py pyexps/ae/t1_netperf.py --filter=* --force --verbose 
+    python3 run.py pyexps/ae/t1_netperf.py --filter=* --force --verbose
 
 fi
 
 
 # Process the results and prints
 python3 pyexps/ae/data_netperf.py out/ > ae/netperf.data
-

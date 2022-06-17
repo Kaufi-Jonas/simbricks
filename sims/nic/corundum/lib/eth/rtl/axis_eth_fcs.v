@@ -33,7 +33,7 @@ module axis_eth_fcs
 (
     input  wire        clk,
     input  wire        rst,
-    
+
     /*
      * AXI input
      */
@@ -42,7 +42,7 @@ module axis_eth_fcs
     output wire        s_axis_tready,
     input  wire        s_axis_tlast,
     input  wire        s_axis_tuser,
-    
+
     /*
      * FCS output
      */

@@ -328,12 +328,12 @@ static void forward_pkt(const void *pkt_data, size_t pkt_len, size_t port_id,
     fprintf(stderr, "[ IP] ");
     fprintf(stderr, "%8X -> %8X len: %lu\n", iph->saddr, iph->daddr,
             ntohs(iph->tot_len) + sizeof(struct ethhdr));
-  } 
+  }
   else if(eth_proto == ETH_P_ARP){
     fprintf(stderr, "[ARP] %8X -> %8X\n",
             *(uint32_t *) ((uint8_t *) pkt_data + 28),
             *(uint32_t *) ((uint8_t *) pkt_data + 38) );
-  } 
+  }
   else{
     fprintf(stderr, "unknown eth type\n");
   }

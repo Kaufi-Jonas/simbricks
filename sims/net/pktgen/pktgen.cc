@@ -302,11 +302,11 @@ static void forward_pkt(const void *pkt_data, size_t pkt_len, size_t port_id) {
   fprintf(stderr, "%20lu: ", cur_ts);
   if (eth_proto == ETH_P_IP){
     fprintf(stderr, "[ IP] ");
-    
-  } 
+
+  }
   else if(eth_proto == ETH_P_ARP){
     fprintf(stderr, "[ARP] ");
-  } 
+  }
   else{
     fprintf(stderr, "unkwon eth type\n");
   }
@@ -344,7 +344,7 @@ static void pollq(Port &port, size_t iport) {
   }
 
 
-  if (poll == Port::kRxPollSuccess) { 
+  if (poll == Port::kRxPollSuccess) {
     //stat received bytes
     pkt_recv_num++;
     pkt_recv_byte += pkt_len;
@@ -388,7 +388,7 @@ static void pollq(Port &port, size_t iport) {
 
 
 static void sendq(Port &port, size_t iport){
-  //then send 
+  //then send
   if (port.IsSync()){
     while((last_pkt_sent + period) <= cur_ts){
       port.TxPacket(packet, PKT_LEN, last_pkt_sent + period);
@@ -402,7 +402,7 @@ static void sendq(Port &port, size_t iport){
   }
   // if not sync: send packet
   // else: send packet periodically until allowed time
-  // while(allowed_timestamp){ since_last_send + period = to_send_time <= curtick 
+  // while(allowed_timestamp){ since_last_send + period = to_send_time <= curtick
   //  txpacket(todest)
   // }
 
@@ -478,9 +478,9 @@ int main(int argc, char *argv[]) {
           period = ULLONG_MAX;
         }
         else{
-          bit_rate = brate * 1000ULL * 1000ULL * 1000ULL; 
+          bit_rate = brate * 1000ULL * 1000ULL * 1000ULL;
           period = (1E12 * 8 * PKT_LEN) / bit_rate; // per packet
-        }     
+        }
         assert(brate < 200);
         break;
 

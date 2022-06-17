@@ -38,7 +38,7 @@ module udp_64 #
 (
     input  wire        clk,
     input  wire        rst,
-    
+
     /*
      * IP frame input
      */
@@ -66,7 +66,7 @@ module udp_64 #
     output wire        s_ip_payload_axis_tready,
     input  wire        s_ip_payload_axis_tlast,
     input  wire        s_ip_payload_axis_tuser,
-    
+
     /*
      * IP frame output
      */
@@ -94,7 +94,7 @@ module udp_64 #
     input  wire        m_ip_payload_axis_tready,
     output wire        m_ip_payload_axis_tlast,
     output wire        m_ip_payload_axis_tuser,
-    
+
     /*
      * UDP frame input
      */
@@ -124,7 +124,7 @@ module udp_64 #
     output wire        s_udp_payload_axis_tready,
     input  wire        s_udp_payload_axis_tlast,
     input  wire        s_udp_payload_axis_tuser,
-    
+
     /*
      * UDP frame output
      */
@@ -156,7 +156,7 @@ module udp_64 #
     input  wire        m_udp_payload_axis_tready,
     output wire        m_udp_payload_axis_tlast,
     output wire        m_udp_payload_axis_tuser,
-    
+
     /*
      * Status signals
      */

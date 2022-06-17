@@ -22,7 +22,7 @@ module key_extract #(
 	input								key_offset_valid,
 	input [KEY_OFF-1:0]					key_offset_w,
 	input [KEY_LEN-1:0]					key_mask_w,
-	
+
 	// output PHV and key
     output reg [PHV_LEN-1:0]            phv_out,
     output reg                          phv_valid_out,
@@ -71,7 +71,7 @@ localparam	IDLE_S=0,
 			CYCLE_1=1;
 reg [2:0] state, state_next;
 
-reg [KEY_LEN-1:0] key_out; 
+reg [KEY_LEN-1:0] key_out;
 // reg ready_out_next;
 
 assign ready_out = 1;

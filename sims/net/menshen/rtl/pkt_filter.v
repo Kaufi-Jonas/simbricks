@@ -75,8 +75,8 @@ seg_fifo (
 	.clk					(clk)
 );
 
-localparam WAIT_FIRST_PKT=0, 
-		   DROP_PKT=1, 
+localparam WAIT_FIRST_PKT=0,
+		   DROP_PKT=1,
 		   FLUSH_DATA=2,
 		   FLUSH_CTL = 3;
 
@@ -94,10 +94,10 @@ reg [1:0] state, state_next;
 reg 								c_switch;
 wire								w_c_switch;
 
-// vlan 
+// vlan
 reg									vlan_id_valid_next;
 
-//for security and reliability 
+//for security and reliability
 
 reg [31:0]								ctrl_token_r, ctrl_token_next;
 
@@ -109,7 +109,7 @@ assign w_c_switch = c_switch;
 assign ctrl_token = ctrl_token_r;
 
 assign vlan_id_w = pkt_fifo_tdata[116 +: 12];
-assign vlan_id_one_hot_w = (1'b1 << vlan_id_w[8:4]); 
+assign vlan_id_one_hot_w = (1'b1 << vlan_id_w[8:4]);
 
 always @(*) begin
 
@@ -129,11 +129,11 @@ always @(*) begin
 
 	ctrl_token_next = ctrl_token_r;
 
-	case (state) 
+	case (state)
 		WAIT_FIRST_PKT: begin
 			if (!pkt_fifo_empty) begin
 				if (m_axis_tready) begin
-					if ((pkt_fifo_tdata[143:128]==`ETH_TYPE_IPV4) && 
+					if ((pkt_fifo_tdata[143:128]==`ETH_TYPE_IPV4) &&
 						(pkt_fifo_tdata[223:216]==`IPPROT_UDP)) begin
 						//checkme: we put the security check here
 						// if(s_axis_tdata[335:320] == `CONTROL_PORT && cookie_w == cookie_val_d1) begin
@@ -176,7 +176,7 @@ always @(*) begin
 						end
 					end
 					else begin
-						
+
 						pkt_fifo_rd_en = 1;
 						r_tvalid = 0;
 						state_next = DROP_PKT;
@@ -263,7 +263,7 @@ always @(posedge clk or negedge aresetn) begin
 			m_axis_tvalid <= r_tvalid;
 
 			// s_axis_tready <= r_s_tready;
-			//reset control path output 
+			//reset control path output
 			c_m_axis_tdata <= 0;
 			c_m_axis_tkeep <= 0;
 			c_m_axis_tuser <= 0;
@@ -279,7 +279,7 @@ always @(posedge clk or negedge aresetn) begin
 			m_axis_tuser <= 0;
 			m_axis_tlast <= 0;
 			m_axis_tvalid <= 0;
-			// 
+			//
 			c_m_axis_tdata <= r_tdata;
 			c_m_axis_tkeep <= r_tkeep;
 			c_m_axis_tuser <= r_tuser;
@@ -287,7 +287,7 @@ always @(posedge clk or negedge aresetn) begin
 
 			c_m_axis_tvalid <= r_tvalid;
 		end
-		
+
 	end
 end
 

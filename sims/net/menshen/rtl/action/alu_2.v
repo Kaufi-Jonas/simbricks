@@ -87,7 +87,7 @@ assign container_out_w = (action_type==4'b1011)?load_data:
 
 7. loadd:     0111
               load data from RAM, increment by 1 write it to container, and write it
-              back to the RAM. 
+              back to the RAM.
 8. set:		  1110
 			  set to an immediate value
 */
@@ -114,22 +114,22 @@ always @(*) begin
 	container_out_valid_next = 0;
 
 	ready_out_next = ready_out;
-	
+
 	case (alu_state)
 		IDLE_S: begin
-			
+
             if (action_valid) begin
 				action_type_next = action_in[24:21];
                 overflow_next = 0;
 				alu_state_next = EMPTY1_S;
 				ready_out_next = 1'b0;
 
-                
+
                 case(action_in[24:21])
-                    //add/addi ops 
+                    //add/addi ops
                     4'b0001, 4'b1001: begin
                         container_out_next = operand_1_in + operand_2_in;
-                    end 
+                    end
                     //sub/subi ops
                     4'b0010, 4'b1010: begin
                         container_out_next = operand_1_in - operand_2_in;
@@ -178,7 +178,7 @@ always @(*) begin
             	        end
             	    end
             	end
-				// 
+				//
 				// load_addr_next = operand_2_in[4:0] + base_addr;
 				alu_state_next = EMPTY2_S;
 			end

@@ -46,14 +46,14 @@ module depar_do_deparsing #(
 	input [C_VLANID_WIDTH-1:0]								vlan_id,
 	input													vlan_fifo_empty,
 	output reg												vlan_fifo_rd_en,
-	// 
+	//
 	input [C_AXIS_DATA_WIDTH-1:0]							fst_half_fifo_tdata,
 	input [C_AXIS_TUSER_WIDTH-1:0]							fst_half_fifo_tuser,
 	input [C_AXIS_DATA_WIDTH/8-1:0]							fst_half_fifo_tkeep,
 	input													fst_half_fifo_tlast,
 	input													fst_half_fifo_empty,
 	output reg												fst_half_fifo_rd_en,
-	// 
+	//
 	input [C_AXIS_DATA_WIDTH-1:0]							snd_half_fifo_tdata,
 	input [C_AXIS_TUSER_WIDTH-1:0]							snd_half_fifo_tuser,
 	input [C_AXIS_DATA_WIDTH/8-1:0]							snd_half_fifo_tkeep,
@@ -231,7 +231,7 @@ always @(*) begin
 	pkts_tkeep_stored_2p_next = pkts_tkeep_stored_2p;
 	pkts_tlast_stored_2p_next = pkts_tlast_stored_2p;
 
-	case (state) 
+	case (state)
 		IDLE: begin
 			if (!vlan_fifo_empty) begin
 				state_next = WAIT_1CYCLE_RAM;
@@ -241,8 +241,8 @@ always @(*) begin
 			state_next = START_SUB_DEPARSE;
 		end
 		START_SUB_DEPARSE: begin
-			if (!fst_half_fifo_empty 
-					&& !snd_half_fifo_empty 
+			if (!fst_half_fifo_empty
+					&& !snd_half_fifo_empty
 					&& !phv_fifo_empty) begin
 
 				if (discard_signal == 1) begin
@@ -347,7 +347,7 @@ always @(*) begin
 			end
 		end
 		DROP_PKT: begin
-			if (fst_half_fifo_tlast==1 
+			if (fst_half_fifo_tlast==1
 				|| snd_half_fifo_tlast==1) begin
 				fst_half_fifo_rd_en = 1;
 				snd_half_fifo_rd_en = 1;
@@ -417,7 +417,7 @@ end
 //===================== sub deparser
 generate
 	genvar index;
-	for (index=0; index<10; index=index+1) 
+	for (index=0; index<10; index=index+1)
 	begin: sub_op
 		sub_deparser #(
 			.C_PKT_VEC_WIDTH(),
@@ -542,12 +542,12 @@ always @(posedge clk or negedge aresetn) begin
                 end
                 else begin
                     c_wr_en <= 1'b0;
-                    c_index <= 4'b0; 
+                    c_index <= 4'b0;
                     entry_reg <= 0;
 
                     c_state <= IDLE_C;
                 end
-            end  
+            end
 //support full table flush
             WRITE_C: begin
                 if(ctrl_s_axis_tvalid) begin

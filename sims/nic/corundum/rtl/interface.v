@@ -816,7 +816,7 @@ always @(posedge clk) begin
         axil_ctrl_bvalid_reg <= 1'b1;
 
         // case ({axil_ctrl_awaddr[15:2], 2'b00})
-        //     16'h0000: 
+        //     16'h0000:
         // endcase
     end
 

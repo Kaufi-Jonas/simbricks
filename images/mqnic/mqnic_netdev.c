@@ -82,7 +82,7 @@ static int mqnic_start_port(struct net_device *ndev)
 
         netif_tx_napi_add(ndev, &priv->tx_cpl_ring[k]->napi, mqnic_poll_tx_cq, NAPI_POLL_WEIGHT);
         napi_enable(&priv->tx_cpl_ring[k]->napi);
-        
+
         mqnic_arm_cq(priv->tx_cpl_ring[k]);
     }
 
@@ -229,7 +229,7 @@ static int mqnic_close(struct net_device *ndev)
 void mqnic_update_stats(struct net_device *ndev)
 {
     struct mqnic_priv *priv = netdev_priv(ndev);
-    unsigned long packets, bytes;   
+    unsigned long packets, bytes;
     int k;
 
     if (unlikely(!priv->port_up))
@@ -674,4 +674,3 @@ void mqnic_destroy_netdev(struct net_device *ndev)
 
     free_netdev(ndev);
 }
-

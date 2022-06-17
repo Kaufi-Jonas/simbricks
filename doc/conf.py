@@ -6,7 +6,6 @@
 # full list see the documentation:
 # http://www.sphinx-doc.org/en/master/config
 
-
 # -- Path setup --------------------------------------------------------------
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -16,7 +15,6 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-
 
 # -- Project information -----------------------------------------------------
 
@@ -30,7 +28,6 @@ author = 'Antoine Kaufmann'
 version = ''
 # The full version, including alpha/beta/rc tags
 release = ''
-
 
 # -- General configuration ---------------------------------------------------
 
@@ -71,7 +68,6 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = None
-
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -116,7 +112,6 @@ html_css_files = [
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'SimBricksdoc'
 
-
 # -- Options for LaTeX output ------------------------------------------------
 
 latex_elements = {
@@ -141,20 +136,20 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'simbricks.tex', 'SimBricks Documentation',
-     'Antoine Kaufmann', 'manual'),
+    (
+        master_doc,
+        'simbricks.tex',
+        'SimBricks Documentation',
+        'Antoine Kaufmann',
+        'manual'
+    ),
 ]
-
 
 # -- Options for manual page output ------------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'simbricks', 'SimBricks Documentation',
-     [author], 1)
-]
-
+man_pages = [(master_doc, 'simbricks', 'SimBricks Documentation', [author], 1)]
 
 # -- Options for Texinfo output ----------------------------------------------
 
@@ -162,11 +157,16 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'simbricks', 'SimBricks Documentation',
-     author, 'SimBricks', 'One line description of project.',
-     'Miscellaneous'),
+    (
+        master_doc,
+        'simbricks',
+        'SimBricks Documentation',
+        author,
+        'SimBricks',
+        'One line description of project.',
+        'Miscellaneous'
+    ),
 ]
-
 
 # -- Options for Epub output -------------------------------------------------
 
@@ -185,13 +185,13 @@ epub_title = project
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
 
-breathe_projects = { 'simbricks': 'doxygen/xml/' }
+breathe_projects = {'simbricks': 'doxygen/xml/'}
 breathe_default_project = 'simbricks'
 
-
+import os
 #################################################################################
 # For RTD
-import subprocess, os
+import subprocess
 
 # Check if we're running on Read the Docs' servers
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'

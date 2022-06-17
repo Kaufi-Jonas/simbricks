@@ -23,15 +23,16 @@
 # Allow type annotation of class to be used in its own constructor
 from __future__ import annotations
 
-from abc import abstractmethod
-import shutil
 import pathlib
+import shutil
 import typing as tp
+from abc import abstractmethod
 
+import simbricks.exectools as exectools
 from simbricks.experiment.experiment_environment import ExpEnv
 from simbricks.experiment.experiment_output import ExpOutput
+
 from simbricks.experiments import Experiment
-import simbricks.exectools as exectools
 
 
 class Run(object):

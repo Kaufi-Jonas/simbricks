@@ -514,7 +514,7 @@ always @(posedge clk) begin
     if (xgmii_rxc[0] && xgmii_rxd[7:0] == XGMII_START) begin
         xgmii_rxd_d0 <= xgmii_rxd;
         xgmii_rxd_crc <= xgmii_rxd;
-        
+
         for (i = 0; i < 8; i = i + 1) begin
             detect_term[i] <= xgmii_rxc[i] && (xgmii_rxd[i*8 +: 8] == XGMII_TERM);
         end

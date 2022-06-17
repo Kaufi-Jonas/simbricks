@@ -24,7 +24,7 @@ module depar_wait_segs #(
 
 	output reg [11:0]									vlan,
 	output reg											vlan_valid,
-	
+
 	output reg [C_AXIS_DATA_WIDTH-1:0]					fst_half_tdata,
 	output reg [C_AXIS_TUSER_WIDTH-1:0]					fst_half_tuser,
 	output reg [C_AXIS_DATA_WIDTH/8-1:0]				fst_half_tkeep,
@@ -224,4 +224,3 @@ always @(posedge clk) begin
 end
 
 endmodule
-

@@ -430,4 +430,3 @@ static void __exit mqnic_exit(void)
 
 module_init(mqnic_init);
 module_exit(mqnic_exit);
-

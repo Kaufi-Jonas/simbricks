@@ -321,7 +321,7 @@ int main(int argc, char *argv[]) {
     }
     ports.push_back(np);
   }
-  
+
   txMAC = new EthernetTx(*top);
   rxMAC = new EthernetRx(*top);
 
@@ -363,7 +363,7 @@ int main(int argc, char *argv[]) {
 #endif
   dump_if(top);
 
-  
+
 
   return 0;
 }

@@ -50,7 +50,7 @@ module cmac_pad #
 (
     input  wire                   clk,
     input  wire                   rst,
-    
+
     /*
      * AXI input
      */

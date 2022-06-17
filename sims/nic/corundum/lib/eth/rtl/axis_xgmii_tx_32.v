@@ -599,7 +599,7 @@ always @(posedge clk) begin
         deficit_idle_count_reg <= deficit_idle_count_next;
 
         s_axis_tready_reg <= s_axis_tready_next;
-    
+
         m_axis_ptp_ts_valid_reg <= m_axis_ptp_ts_valid_next;
 
         xgmii_txd_reg <= xgmii_txd_next;

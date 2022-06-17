@@ -20,4 +20,3 @@ python3 run.py pyexps/ae/no-simbricks.py --filter no_simb-gt-busy --force --verb
 
 # Process the results and prints
 python3 pyexps/ae/data_sync_overhead.py out/ > ae/sync_overhead.data
-

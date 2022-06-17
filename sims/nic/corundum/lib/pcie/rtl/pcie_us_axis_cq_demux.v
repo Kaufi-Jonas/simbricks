@@ -189,13 +189,13 @@ always @* begin
         m_axis_cq_tkeep_int  = temp_s_axis_cq_tkeep;
         m_axis_cq_tvalid_int = (temp_s_axis_cq_tvalid && s_axis_cq_tready && !drop_ctl) << select_ctl;
         m_axis_cq_tlast_int  = temp_s_axis_cq_tlast;
-        m_axis_cq_tuser_int  = temp_s_axis_cq_tuser; 
+        m_axis_cq_tuser_int  = temp_s_axis_cq_tuser;
     end else begin
         m_axis_cq_tdata_int  = s_axis_cq_tdata;
         m_axis_cq_tkeep_int  = s_axis_cq_tkeep;
         m_axis_cq_tvalid_int = (s_axis_cq_tvalid && s_axis_cq_tready && !drop_ctl) << select_ctl;
         m_axis_cq_tlast_int  = s_axis_cq_tlast;
-        m_axis_cq_tuser_int  = s_axis_cq_tuser; 
+        m_axis_cq_tuser_int  = s_axis_cq_tuser;
     end
 end
 

@@ -562,7 +562,7 @@ always @* begin
     s_axis_tx_req_ready_next = enable && pkt_table_free_ptr_valid && !desc_table_active[desc_table_start_ptr_reg & DESC_PTR_MASK] && ($unsigned(desc_table_start_ptr_reg - desc_table_finish_ptr_reg) < DESC_TABLE_SIZE) && (!m_axis_desc_req_valid || m_axis_desc_req_ready);
     if (s_axis_tx_req_ready && s_axis_tx_req_valid) begin
         s_axis_tx_req_ready_next = 1'b0;
- 
+
         // store in descriptor table
         desc_table_start_tag = s_axis_tx_req_tag;
         desc_table_start_queue = s_axis_tx_req_queue;

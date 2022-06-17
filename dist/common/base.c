@@ -470,7 +470,7 @@ void BaseEntryReceived(struct Peer *peer, uint32_t pos, void *data)
   void *entry = peer->cleanup_base + off;
   volatile union SimbricksProtoBaseMsg *msg =
         (volatile union SimbricksProtoBaseMsg *) entry;
-  
+
   // first copy data after header
   memcpy((void *) (msg + 1), (uint8_t *) data + sizeof(*msg),
           peer->cleanup_elen - sizeof(*msg));

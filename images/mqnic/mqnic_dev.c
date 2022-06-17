@@ -79,7 +79,7 @@ static int mqnic_map_registers(struct mqnic_dev *mqnic, struct vm_area_struct *v
         dev_dbg(dev, "mqnic_map_registers: Mapped registers region at phys: 0x%pap, virt: 0x%p", &mqnic->hw_regs_phys, (void *)vma->vm_start);
     }
 
-    return ret;    
+    return ret;
 }
 
 static int mqnic_mmap(struct file *filp, struct vm_area_struct *vma)

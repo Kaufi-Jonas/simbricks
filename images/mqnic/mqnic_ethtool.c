@@ -78,4 +78,3 @@ const struct ethtool_ops mqnic_ethtool_ops = {
     .get_drvinfo = mqnic_get_drvinfo,
     .get_ts_info = mqnic_get_ts_info
 };
-

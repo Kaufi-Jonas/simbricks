@@ -16,9 +16,8 @@ do
     EXP=$MTU-$K
     sleep 1
     ssh honey2.kaist.ac.kr -p 2222 sudo taskset 0x02 iperf -c 10.9.9.11 -i 1 -Z dctcp -w 400K -t $DUR > $EXP-1.txt &
-    ssh honey3.kaist.ac.kr -p 2222 sudo taskset 0x02 iperf -c 10.9.9.11 -i 1 -Z dctcp -w 400K -t $DUR > $EXP-2.txt 
+    ssh honey3.kaist.ac.kr -p 2222 sudo taskset 0x02 iperf -c 10.9.9.11 -i 1 -Z dctcp -w 400K -t $DUR > $EXP-2.txt
     wait
     cat $EXP-*.txt
     sleep 3
 done
-

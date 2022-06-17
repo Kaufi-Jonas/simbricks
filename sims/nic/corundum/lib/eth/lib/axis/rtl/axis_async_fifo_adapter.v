@@ -240,11 +240,11 @@ end else if (EXPAND_BUS) begin
     assign m_axis_tid = post_fifo_axis_tid;
     assign m_axis_tdest = post_fifo_axis_tdest;
     assign m_axis_tuser = post_fifo_axis_tuser;
-    
+
 end else begin
 
     // input wider, adapt width after FIFO
-    
+
     assign pre_fifo_axis_tdata = s_axis_tdata;
     assign pre_fifo_axis_tkeep = s_axis_tkeep;
     assign pre_fifo_axis_tvalid = s_axis_tvalid;

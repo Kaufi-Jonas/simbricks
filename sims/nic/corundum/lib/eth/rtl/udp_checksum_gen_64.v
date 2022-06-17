@@ -37,7 +37,7 @@ module udp_checksum_gen_64 #
 (
     input  wire        clk,
     input  wire        rst,
-    
+
     /*
      * UDP frame input
      */
@@ -65,7 +65,7 @@ module udp_checksum_gen_64 #
     output wire        s_udp_payload_axis_tready,
     input  wire        s_udp_payload_axis_tlast,
     input  wire        s_udp_payload_axis_tuser,
-    
+
     /*
      * UDP frame output
      */
@@ -97,7 +97,7 @@ module udp_checksum_gen_64 #
     input  wire        m_udp_payload_axis_tready,
     output wire        m_udp_payload_axis_tlast,
     output wire        m_udp_payload_axis_tuser,
-    
+
     /*
      * Status signals
      */

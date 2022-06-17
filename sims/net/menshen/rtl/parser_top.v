@@ -227,7 +227,7 @@ reg parser_valid_next, parser_valid_r;
 always @(*) begin
 	p_state_next = p_state;
 	p_cur_queue_next = p_cur_queue;
-	
+
 	pkt_hdr_vec_next = pkt_hdr_vec;
 	parser_valid_next = 0;
 	case (p_state)
@@ -363,7 +363,7 @@ always @(*) begin
 	out_bram_valid_next = 0;
 
 	bram_ready_next = bram_ready;
-	case (bram_state) 
+	case (bram_state)
 		BRAM_IDLE: begin
 			if (s_vlan_id_valid) begin
 				bram_state_next = BRAM_CYCLE_1;
@@ -407,7 +407,7 @@ fallthrough_small_fifo #(
 pkt_hdr_fifo (
 	.din				(pkt_hdr_vec_w),
 	.wr_en				(parser_valid_w),
-	
+
 	.dout				(phv_fifo_out),
 	.rd_en				(phv_fifo_rd_en),
 	.full				(),
@@ -424,7 +424,7 @@ fallthrough_small_fifo #(
 vlan_fifo (
 	.din				(parser_out_vlan),
 	.wr_en				(parser_out_vlan_valid),
-	
+
 	.dout				(vlan_fifo_out),
 	.rd_en				(vlan_fifo_rd_en),
 	.full				(),
@@ -484,9 +484,9 @@ assign ctrl_s_axis_tdata_swapped = {	ctrl_s_axis_tdata[0+:8],
 									ctrl_s_axis_tdata[232+:8],
 									ctrl_s_axis_tdata[240+:8],
 									ctrl_s_axis_tdata[248+:8],
-									ctrl_s_axis_tdata[256+:8], 
-									ctrl_s_axis_tdata[264+:8], 
-									ctrl_s_axis_tdata[272+:8], 
+									ctrl_s_axis_tdata[256+:8],
+									ctrl_s_axis_tdata[264+:8],
+									ctrl_s_axis_tdata[272+:8],
 									ctrl_s_axis_tdata[280+:8],
 									ctrl_s_axis_tdata[288+:8],
 									ctrl_s_axis_tdata[296+:8],
@@ -550,7 +550,7 @@ always @(posedge axis_clk or negedge aresetn) begin
                 end
                 else begin
                     c_wr_en <= 1'b0;
-                    c_index <= 4'b0; 
+                    c_index <= 4'b0;
                     entry_reg <= 0;
 
                     ctrl_m_axis_tdata <= ctrl_s_axis_tdata;

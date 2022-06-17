@@ -325,7 +325,7 @@ IGbE::write(Addr daddr, uint8_t len, const void *src)
     //
     // Handle write of register here
     //
-    
+
 
     Regs::RCTL oldrctl;
     Regs::TCTL oldtctl;

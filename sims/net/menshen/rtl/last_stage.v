@@ -233,7 +233,7 @@ action_engine #(
 	.c_m_axis_tlast(c_m_axis_tlast)
 );
 
-// pkt_hdr_vec_next = {pkt_hdr_vec_w[PKT_HDR_LEN-1:145], p_cur_queue_val, pkt_hdr_vec_w[0+:141]}; 
+// pkt_hdr_vec_next = {pkt_hdr_vec_w[PKT_HDR_LEN-1:145], p_cur_queue_val, pkt_hdr_vec_w[0+:141]};
 // position: [141+:4]
 //
 

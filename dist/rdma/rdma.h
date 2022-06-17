@@ -42,4 +42,3 @@ struct ibv_qp *RdmaIBCreateQP(struct ibv_pd *pd,
                               struct ibv_qp_init_attr *attr);
 
 #endif  // DIST_RDMA_H_
-

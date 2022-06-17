@@ -415,7 +415,7 @@ generate
     genvar n;
 
     for (n = 0; n < COUNT; n = n + 1) begin
-        
+
         tdma_ber_ch #(
             .INDEX_WIDTH(INDEX_WIDTH),
             .SLICE_WIDTH(SLICE_WIDTH),

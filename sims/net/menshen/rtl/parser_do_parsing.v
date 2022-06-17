@@ -71,7 +71,7 @@ localparam			IDLE=0,
 					GET_PHV_OUTPUT=4,
 					OUTPUT=5,
 					EMPTY_1=6;
-					
+
 
 //
 reg [PKT_HDR_LEN-1:0]	pkt_hdr_vec_next;
@@ -209,7 +209,7 @@ always @(*) begin
 			if (stg_ready_in) begin
 				parser_valid_next = 1;
 				state_next = IDLE;
-				
+
 				// zero out
 				val_2B_nxt[0]=0;
 				val_2B_nxt[1]=0;
@@ -356,5 +356,3 @@ endgenerate
 
 
 endmodule
-
-

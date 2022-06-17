@@ -13,4 +13,3 @@ python3 run.py pyexps/ae/f1_dctcp.py --filter gt-ib-* --force --verbose --parall
 
 # Process the results and prints
 python3 pyexps/ae/data_sb_dctcp.py out/ > ae/dctcp_simbricks.data
-

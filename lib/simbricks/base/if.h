@@ -297,7 +297,7 @@ static inline volatile union SimbricksProtoBaseMsg *SimbricksBaseIfOutAlloc(
   base_if->out_timestamp = timestamp;
 
   base_if->out_pos = (base_if->out_pos + 1) % base_if->out_enum;
-  return msg;  
+  return msg;
 }
 
 /**
@@ -339,7 +339,7 @@ static inline int SimbricksBaseIfOutSync(struct SimbricksBaseIf *base_if,
     return -1;
 
   SimbricksBaseIfOutSend(base_if, msg, SIMBRICKS_PROTO_MSG_TYPE_SYNC);
-  return 0;  
+  return 0;
 }
 
 /**
@@ -356,7 +356,7 @@ static inline uint64_t SimbricksBaseIfOutNextSync(
 
 /**
  * Retrieve maximal total message length for outgoing messages.
- * 
+ *
  * @param base_if Base interface handle (connected).
  * @return Maximal message length in bytes.
  */

@@ -5,10 +5,9 @@ index 492da7f2..504fc70a 100644
 @@ -208,6 +208,9 @@ static void ERRSVKWD(FileLine* fileline, const string& tokname) {
  class AstSenTree;
  %}
- 
+
 +BISONPRE_VERSION(3.0,%define parse.error verbose)
 +BISONPRE_VERSION(3.7,%define api.header.include {"V3ParseBison.h"})
 +
  // When writing Bison patterns we use yTOKEN instead of "token",
  // so Bison will error out on unknown "token"s.
- 

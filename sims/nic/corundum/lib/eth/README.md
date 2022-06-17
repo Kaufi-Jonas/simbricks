@@ -39,7 +39,7 @@ parametrizable datapath.
 
 ### arp_cache module
 
-Basic hash-based cache for ARP entries.  Parametrizable depth.  
+Basic hash-based cache for ARP entries.  Parametrizable depth.
 
 ### arp_eth_rx module
 
@@ -468,7 +468,7 @@ transfer with header data
     clk        __/  \__/  \__/  \__/  \__/  \__/  \__/  \__
                ______________                   ___________
     hdr_ready                \_________________/
-                        _____ 
+                        _____
     hdr_valid  ________/     \_____________________________
                         _____
     hdr_data   XXXXXXXXX_HDR_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX

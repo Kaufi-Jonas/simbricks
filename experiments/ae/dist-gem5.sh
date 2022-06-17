@@ -19,4 +19,3 @@ cd $GEM5_BASE/util/simbricks
 echo "Done running simbricks data points"
 # Process the results and prints
 python3 pyexps/ae/data_dist.py $GEM5_BASE/util/simbricks/ > ae/dist_simbricks.data
-

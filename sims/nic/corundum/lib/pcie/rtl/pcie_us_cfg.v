@@ -115,7 +115,7 @@ always @* begin
         cfg_mgmt_read_next = 1'b1;
         if (cfg_mgmt_read_write_done) begin
             cfg_mgmt_read_next = 1'b0;
-            
+
             ext_tag_enable_next[func_cnt_reg] = cfg_mgmt_read_data[8];
             max_read_request_size_next[func_cnt_reg*3 +: 3] = cfg_mgmt_read_data[14:12];
             max_payload_size_next[func_cnt_reg*3 +: 3] = cfg_mgmt_read_data[7:5];
@@ -162,7 +162,7 @@ always @(posedge clk) begin
         delay_reg <= delay_next;
         func_cnt_reg <= func_cnt_next;
     end
-    
+
     cfg_mgmt_write_data_reg <= cfg_mgmt_write_data_next;
     cfg_mgmt_byte_enable_reg <= cfg_mgmt_byte_enable_next;
 

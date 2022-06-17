@@ -47,7 +47,7 @@ module action_engine #(
 	output reg 								    c_m_axis_tlast
 );
 
-                        
+
 /********intermediate variables declared here********/
 localparam width_2B = 16;
 localparam width_4B = 32;
@@ -190,7 +190,7 @@ always @(*) begin
 	act_vlan_ready_next = act_vlan_ready;
 	page_tbl_out_valid_next = 0;
 
-	case (vlan_fifo_state) 
+	case (vlan_fifo_state)
 		VLAN_FIFO_IDLE: begin
 			if (act_vlan_valid_in) begin
 				vlan_fifo_state_next = VLAN_FIFO_1CYCLE;
@@ -291,7 +291,7 @@ crossbar #(
 //ALU_1
 genvar gen_i;
 generate
-    //initialize 8 6B containers 
+    //initialize 8 6B containers
     for(gen_i = 7; gen_i >= 0; gen_i = gen_i - 1) begin
         alu_1 #(
             .STAGE_ID(STAGE_ID),
@@ -401,7 +401,7 @@ alu_3 #(
     CONTROL PATH
 */
 
-generate 
+generate
 	if (C_S_AXIS_DATA_WIDTH == 512) begin
 		/****control path for 512b*****/
 		wire [7:0]          mod_id; //module ID
@@ -409,16 +409,16 @@ generate
 		reg  [7:0]          c_index; //table index(addr)
 		reg                 c_wr_en; //enable table write(wen)
 		reg [15:0]			entry_reg;
-		
+
 		reg  [2:0]          c_state;
-		
+
 		localparam IDLE_C = 0,
 		           WRITE_C = 1,
 				   SU_WRITE_C = 2;
-		
+
 		assign mod_id = c_s_axis_tdata[368+:8];
 		assign control_flag = c_s_axis_tdata[335:320];
-		
+
 		//LE to BE switching
 		wire[C_S_AXIS_DATA_WIDTH-1:0] c_s_axis_tdata_swapped;
 		assign c_s_axis_tdata_swapped = {	c_s_axis_tdata[0+:8],
@@ -486,12 +486,12 @@ generate
 		                                    c_s_axis_tdata[496+:8],
 		                                    c_s_axis_tdata[504+:8]
 		                                };
-		
+
 		always @(posedge clk or negedge rst_n) begin
 		    if(~rst_n) begin
 		        c_wr_en <= 1'b0;
 		        c_index <= 4'b0;
-		
+
 		        c_m_axis_tdata <= 0;
 		        c_m_axis_tuser <= 0;
 		        c_m_axis_tkeep <= 0;
@@ -499,7 +499,7 @@ generate
 		        c_m_axis_tlast <= 0;
 
 				entry_reg <= 0;
-		
+
 		        c_state <= IDLE_C;
 		    end
 		    else begin
@@ -508,26 +508,26 @@ generate
 		                if(c_s_axis_tvalid && mod_id[7:3] == STAGE_ID && mod_id[2:0] == ACTION_ID && control_flag == 16'hf2f1)begin
 		                    c_wr_en <= 1'b0;
 		                    c_index <= c_s_axis_tdata[384+:8];
-		
+
 		                    c_m_axis_tdata <= 0;
 		                    c_m_axis_tuser <= 0;
 		                    c_m_axis_tkeep <= 0;
 		                    c_m_axis_tvalid <= 0;
 		                    c_m_axis_tlast <= 0;
-		
+
 		                    c_state <= WRITE_C;
-		
+
 		                end
 		                else begin
 		                    c_wr_en <= 1'b0;
-		                    c_index <= 4'b0; 
-		
+		                    c_index <= 4'b0;
+
 		                    c_m_axis_tdata <= c_s_axis_tdata;
 		                    c_m_axis_tuser <= c_s_axis_tuser;
 		                    c_m_axis_tkeep <= c_s_axis_tkeep;
 		                    c_m_axis_tvalid <= c_s_axis_tvalid;
 		                    c_m_axis_tlast <= c_s_axis_tlast;
-		
+
 		                    c_state <= IDLE_C;
 		                end
 		            end
@@ -565,11 +565,11 @@ generate
 						end
 					end
 		        endcase
-		
+
 		    end
 		end
-		
-		
+
+
 		//page table
 		page_tbl_16w_32d
 		page_tbl_16w_32d
@@ -580,7 +580,7 @@ generate
 		    .dina(entry_reg),
 		    .ena(1'b1),
 		    .wea(c_wr_en),
-		
+
 		    //match
 		    .addrb(act_vlan_in[8:4]),
 		    .clkb(clk),
@@ -631,7 +631,7 @@ generate
 					PARSE_C = 1,
 					RAM_ENTRY = 2,
 					FLUSH_REST_C = 3;
-		// 
+		//
 		reg [2:0] c_state, c_state_next;
 		reg [C_S_AXIS_DATA_WIDTH-1:0]		r_tdata, c_s_axis_tdata_d1;
 		reg [C_S_AXIS_TUSER_WIDTH-1:0]		r_tuser, c_s_axis_tuser_d1;
@@ -668,7 +668,7 @@ generate
 			c_wr_en_next = 0;
 			c_wr_data_next = c_wr_data;
 
-			case (c_state) 
+			case (c_state)
 				IDLE_C: begin // 1st segment
 					r_tvalid = 0;
 					if (c_s_axis_tvalid) begin
@@ -683,7 +683,7 @@ generate
 					end
 				end
 				PARSE_C: begin // 2nd segment
-					if (mod_id[7:3] == STAGE_ID && mod_id[2:0] == ACTION_ID && 
+					if (mod_id[7:3] == STAGE_ID && mod_id[2:0] == ACTION_ID &&
 						control_flag == 16'hf2f1 && c_s_axis_tvalid) begin
 						// should not emit segment
 						c_index_next = c_s_axis_tdata[128+:8];
@@ -705,7 +705,7 @@ generate
 					if (c_s_axis_tvalid) begin
 						c_wr_en_next = 1; // next clk to write
 						c_wr_data_next = c_s_axis_tdata_swapped[255-:16];
-						
+
 						c_state_next = FLUSH_REST_C;
 					end
 				end
@@ -777,7 +777,7 @@ generate
 				c_s_axis_tkeep_d1 <= c_s_axis_tkeep;
 				c_s_axis_tlast_d1 <= c_s_axis_tlast;
 				c_s_axis_tvalid_d1 <= c_s_axis_tvalid;
-				// 
+				//
 				r_1st_tdata <= r_1st_tdata_next;
 				r_1st_tkeep <= r_1st_tkeep_next;
 				r_1st_tuser <= r_1st_tuser_next;
@@ -795,7 +795,7 @@ generate
 		    .dina(c_wr_data),
 		    .ena(1'b1),
 		    .wea(c_wr_en),
-		
+
 		    //match
 		    .addrb(act_vlan_in[8:4]),
 		    .clkb(clk),

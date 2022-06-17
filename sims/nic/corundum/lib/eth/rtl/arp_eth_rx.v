@@ -118,7 +118,7 @@ ARP Frame
 
 This module receives an Ethernet frame with header fields in parallel and
 payload on an AXI stream interface, decodes the ARP packet fields, and
-produces the frame fields in parallel.  
+produces the frame fields in parallel.
 
 */
 
@@ -317,7 +317,7 @@ always @(posedge clk) begin
         busy_reg <= 1'b0;
         error_header_early_termination_reg <= 1'b0;
         error_invalid_header_reg <= 1'b0;
-    end 
+    end
 end
 
 endmodule

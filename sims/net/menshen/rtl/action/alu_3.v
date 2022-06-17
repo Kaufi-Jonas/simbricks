@@ -14,7 +14,7 @@ module alu_3 #(
 
     //output is the modified metadata plus comp_ins
     output reg [META_LEN-1:0]  			comp_meta_data_out,
-    output reg                          comp_meta_data_valid_out     
+    output reg                          comp_meta_data_valid_out
 );
 
 //need delay for one cycle before the result pushed out
@@ -33,13 +33,13 @@ metadata fields that are related:
     [249:129]: reservered for other use;
     [128]:     discard_field;
     [127:0]:   copied from NetFPGA's md;
-    
+
 */
 
 localparam IDLE_S=3'd0,
 		   WAIT1_S=3'd1,
-		   WAIT2_S=3'd2, 
-		   WAIT3_S=3'd3, 
+		   WAIT2_S=3'd2,
+		   WAIT3_S=3'd3,
 		   OUTPUT_S=3'd4;
 
 reg [2:0]						state, state_next;

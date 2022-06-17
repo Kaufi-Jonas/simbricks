@@ -241,7 +241,7 @@ void mqnic_phc_set_from_system_clock(struct ptp_clock_info *ptp)
 {
     struct timespec64 ts;
 
-#ifdef ktime_get_clocktai_ts64 
+#ifdef ktime_get_clocktai_ts64
     ktime_get_clocktai_ts64(&ts);
 #else
     ts = ktime_to_timespec64(ktime_get_clocktai());
@@ -301,4 +301,3 @@ void mqnic_unregister_phc(struct mqnic_dev *mdev)
         dev_info(&mdev->pdev->dev, "unregistered PHC");
     }
 }
-

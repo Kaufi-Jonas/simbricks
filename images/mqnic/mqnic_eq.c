@@ -229,4 +229,3 @@ void mqnic_process_eq(struct net_device *ndev, struct mqnic_eq_ring *eq_ring)
     eq_ring->tail_ptr = eq_tail_ptr;
     mqnic_eq_write_tail_ptr(eq_ring);
 }
-

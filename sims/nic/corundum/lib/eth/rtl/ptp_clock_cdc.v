@@ -326,7 +326,7 @@ always @(posedge output_clk) begin
     end
 
     if (read) begin
-        
+
     end
 
     if (output_rst) begin

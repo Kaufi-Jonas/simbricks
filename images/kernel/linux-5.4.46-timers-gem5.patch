@@ -4,12 +4,12 @@ diff -ur linux-5.4.46/arch/x86/kernel/apic/apic.c linux-5.4.46.our/arch/x86/kern
 @@ -1034,6 +1034,8 @@
  		return -1;
  	}
- 
+
 +
 +        printk(KERN_ERR " calibrated lapic_timer_period=%u\n", lapic_timer_period);
  	return 0;
  }
- 
+
 @@ -2916,3 +2918,13 @@
  	return 0;
  }
@@ -30,7 +30,7 @@ diff -ur linux-5.4.46/arch/x86/kernel/tsc.c linux-5.4.46.our/arch/x86/kernel/tsc
 @@ -51,6 +51,8 @@
  static u64 art_to_tsc_offset;
  struct clocksource *art_related_clocksource;
- 
+
 +static unsigned long tsc_override_freq = 0;
 +
  struct cyc2ns {
@@ -39,7 +39,7 @@ diff -ur linux-5.4.46/arch/x86/kernel/tsc.c linux-5.4.46.our/arch/x86/kernel/tsc
 @@ -862,6 +864,8 @@
  {
  	unsigned long flags, fast_calibrate = cpu_khz_from_cpuid();
- 
+
 +	if (tsc_override_freq)
 +		return tsc_override_freq;
  	if (!fast_calibrate)
@@ -52,7 +52,7 @@ diff -ur linux-5.4.46/arch/x86/kernel/tsc.c linux-5.4.46.our/arch/x86/kernel/tsc
 +        pr_warn("calibrated TSC: tsc_freq=%lu\n", fast_calibrate);
  	return fast_calibrate;
  }
- 
+
 @@ -1534,3 +1539,14 @@
  	return 0;
  }

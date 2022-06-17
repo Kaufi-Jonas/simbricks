@@ -1267,7 +1267,7 @@ always @* begin
 
     // tag table write management
     if (tag_table_we_tlp_reg) begin
-        
+
     end else if (tlp_cmd_valid_reg) begin
         tlp_cmd_ready = 1'b1;
         tag_table_we_req = 1'b1;
@@ -1440,7 +1440,7 @@ always @* begin
     store_axis_rq_int_to_output = 1'b0;
     store_axis_rq_int_to_temp = 1'b0;
     store_axis_rq_temp_to_output = 1'b0;
-    
+
     if (m_axis_rq_tready_int_reg) begin
         // input is ready
         if (m_axis_rq_tready || !m_axis_rq_tvalid_reg) begin
@@ -1533,7 +1533,7 @@ for (n = 0; n < SEG_COUNT; n = n + 1) begin
         store_axi_w_int_to_output = 1'b0;
         store_axi_w_int_to_temp = 1'b0;
         store_axi_w_temp_to_output = 1'b0;
-        
+
         if (ram_wr_cmd_ready_int_reg[n +: 1]) begin
             // input is ready
             if (ram_wr_cmd_ready[n +: 1] || !ram_wr_cmd_valid_reg) begin

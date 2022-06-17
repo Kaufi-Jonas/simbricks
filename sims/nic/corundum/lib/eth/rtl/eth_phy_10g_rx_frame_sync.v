@@ -126,7 +126,7 @@ always @(posedge clk) begin
         slip_count_reg <= slip_count_next;
         rx_block_lock_reg <= rx_block_lock_next;
     end
-    
+
     serdes_rx_bitslip_reg <= serdes_rx_bitslip_next;
 end
 

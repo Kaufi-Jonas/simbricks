@@ -44,7 +44,7 @@ int MultiNicRunner::CompRunner::NicIfInit() {
   // NicIfInit will block, so run it in a separate thread and then wait for it
   std::thread t([this, &ready, &result](){
       result = Runner::NicIfInit();
-      ready = true; 
+      ready = true;
     });
 
   while (!ready)

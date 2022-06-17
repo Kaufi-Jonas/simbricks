@@ -133,7 +133,7 @@ assign out_cur_queue_plus1 = (out_cur_queue==1)?0:out_cur_queue+1;
 always @(*) begin
 	pkt_hdr_vec_next = pkt_hdr_vec;
 	parser_valid_next = 0;
-	
+
 	out_cur_queue_next = out_cur_queue;
 
 	if (sub_parser_pkt_hdr_valid_d1[out_cur_queue]) begin

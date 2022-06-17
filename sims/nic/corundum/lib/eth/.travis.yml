@@ -12,4 +12,3 @@ before_install:
   - cd $d
 script:
   - cd tb && py.test
-

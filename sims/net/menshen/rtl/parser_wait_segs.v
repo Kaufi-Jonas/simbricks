@@ -9,14 +9,14 @@ module parser_wait_segs #(
 (
 	input											axis_clk,
 	input											aresetn,
-	
+
 	//
 	input [C_AXIS_DATA_WIDTH-1:0]					s_axis_tdata,
 	input [C_AXIS_TUSER_WIDTH-1:0]					s_axis_tuser,
 	input [C_AXIS_DATA_WIDTH/8-1:0]					s_axis_tkeep,
 	input											s_axis_tvalid,
 	input											s_axis_tlast,
-	
+
 	//
 	output reg[C_NUM_SEGS*C_AXIS_DATA_WIDTH-1:0]	tdata_segs,
 	output reg[C_AXIS_TUSER_WIDTH-1:0]				tuser_1st,

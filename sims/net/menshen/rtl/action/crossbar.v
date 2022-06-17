@@ -108,7 +108,7 @@ assign sub_action[1] = action_in[ACT_LEN*25-1 -23*ACT_LEN-:ACT_LEN];
 
 assign sub_action[0] = action_in[ACT_LEN*25-1 -24*ACT_LEN-:ACT_LEN];
 
-//assign inputs for ALUs 
+//assign inputs for ALUs
 
 always @(posedge clk) begin
 	action_out <= action_in;
@@ -138,13 +138,13 @@ always @(posedge clk or negedge rst_n) begin
         alu_in_4B_3 <= 256'b0;
         alu_in_2B_1 <= 128'b0;
         alu_in_2B_2 <= 128'b0;
-       
+
 		state <= IDLE;
 		ready_out <= 1;
     end
 
     else begin
-		case (state) 
+		case (state)
 			IDLE: begin
 
 				if(phv_in_valid == 1'b1) begin
@@ -237,10 +237,10 @@ always @(posedge clk or negedge rst_n) begin
         		            end
         		        endcase
         		    end
-        		    
+
         		    //the left is metadata & conditional ins, no need to modify
         		    phv_remain_data <= phv_in[255:0];
-        		end 
+        		end
 
         		else begin
         		    alu_in_valid <= 1'b0;

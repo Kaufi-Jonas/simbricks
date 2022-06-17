@@ -156,7 +156,7 @@ always @* begin
     m_axis_rc_tkeep_int  = s_axis_rc_tkeep;
     m_axis_rc_tvalid_int = (s_axis_rc_tvalid && s_axis_rc_tready && !drop_ctl) << select_ctl;
     m_axis_rc_tlast_int  = s_axis_rc_tlast;
-    m_axis_rc_tuser_int  = s_axis_rc_tuser; 
+    m_axis_rc_tuser_int  = s_axis_rc_tuser;
 end
 
 always @(posedge clk) begin

@@ -375,7 +375,7 @@ always @* begin
             end else begin
                 ram_mask_next = {SEG_COUNT{1'b1}};
             end
-            
+
             m_axis_read_desc_status_tag_next = axis_cmd_tag_reg;
             axis_id_next = axis_cmd_axis_id_reg;
             axis_dest_next = axis_cmd_axis_dest_reg;

@@ -24,7 +24,7 @@ module lookup_engine_top #(
     //output to the action engine
     output [ACT_LEN-1:0]			action,
     output							action_valid,
-    output [PHV_LEN-1:0]			phv_out, 
+    output [PHV_LEN-1:0]			phv_out,
 	input							ready_in,
 
 	// output vlan to ALU vlan fifo

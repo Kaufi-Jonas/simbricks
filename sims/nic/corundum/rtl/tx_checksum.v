@@ -324,7 +324,7 @@ always @(posedge clk) begin
         sum_offset_reg[0] <= s_axis_cmd_csum_offset;
         sum_init_reg[0] <= s_axis_cmd_csum_init;
         first_cycle_reg <= 1'b1;
-        
+
         if (s_axis_cmd_csum_start >= KEEP_WIDTH) begin
             mask_reg <= 0;
             input_offset_reg <= s_axis_cmd_csum_start - KEEP_WIDTH;

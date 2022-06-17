@@ -238,7 +238,7 @@ always @* begin
     end
     4'bzzz1: begin
         control_masked = 0;
-        tkeep_mask = 4'b0000;   
+        tkeep_mask = 4'b0000;
     end
     4'bzz10: begin
         control_masked = xgmii_rxc_d0[0];
