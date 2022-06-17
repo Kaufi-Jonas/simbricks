@@ -38,3 +38,12 @@ repos:
                 "-rn", # Only display messages
                 "-sn", # Don't display the score
             ]
+-   repo: local
+    hooks:
+    -   id: pytype
+        name: pytype
+        entry: pytype
+        language: python
+        types: [python]
+        pass_filenames: false
+        args: [--config=.pytype.cfg, experiments/]
