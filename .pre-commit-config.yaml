@@ -28,7 +28,6 @@ repos:
     hooks:
     -   id: isort
         name: isort (python)
-        args: [--show-config]
 -   repo: local
     hooks:
     -   id: pylint
