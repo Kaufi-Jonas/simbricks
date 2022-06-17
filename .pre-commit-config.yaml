@@ -1,5 +1,5 @@
 ci:
-    autofix_prs: false
+    # autofix_prs: false
     autoupdate_schedule: quarterly
     skip:
     -   pylint
@@ -28,7 +28,7 @@ repos:
     hooks:
     -   id: isort
         name: isort (python)
-        args: [--show-config, djeudjsl]
+        args: [--show-config]
 -   repo: local
     hooks:
     -   id: pylint
