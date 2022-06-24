@@ -1,0 +1,20 @@
+name: push-to-gitlab
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint-python:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - shell: bash
+      env:
+        GITLAB_ACCESS_TOKEN: ${{ secrets.GITLAB_ACCESS_TOKEN }}
+      run: |
+        BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+        git remote add gitlab https://jkaufman:$GITLAB_ACCESS_TOKEN@gitlab.mpi-sws.org/jkaufman/sync-test.git
+        git push --set-upstream gitlab $BRANCH_NAME
+
