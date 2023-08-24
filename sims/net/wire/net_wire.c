@@ -143,13 +143,23 @@ int main(int argc, char *argv[]) {
 
   printf("start polling\n");
   while (!exiting) {
-    if (SimbricksNetIfOutSync(&nsif_a, cur_ts) != 0) {
-      fprintf(stderr, "SimbricksNetIfOutSync(nsif_a) failed\n");
-      abort();
+    while (true) {
+      int status = SimbricksNetIfOutSync(&nsif_a, cur_ts);
+      if (status == 0 || status == 1) {
+        break;
+      }
+      fprintf(stderr,
+              "warn: SimbricksNetIfOutSync(nsif_a) failed with %d (t=%lu)\n",
+              status, cur_ts);
     }
-    if (SimbricksNetIfOutSync(&nsif_b, cur_ts) != 0) {
-      fprintf(stderr, "SimbricksNetIfN2DSync(nsif_b) failed\n");
-      abort();
+    while (true) {
+      int status = SimbricksNetIfOutSync(&nsif_b, cur_ts);
+      if (status == 0 || status == 1) {
+        break;
+      }
+      fprintf(stderr,
+              "warn: SimbricksNetIfOutSync(nsif_b) failed with %d (t=%lu)\n",
+              status, cur_ts);
     }
 
     do {
