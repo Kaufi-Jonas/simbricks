@@ -59,7 +59,7 @@ for pci_type in pci_latency:
     # pylint: disable=redefined-outer-name
     def nic_pci(pci_type: int):
         n = sim.I40eNIC()
-        n.sync_period = pci_type
+        n.pci_sync_period = pci_type
         n.pci_latency = pci_type
         return n
 

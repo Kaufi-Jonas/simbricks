@@ -108,7 +108,8 @@ for proto_config in proto_configs:
                             ip_start=100
                         )
                         sequencer[0].node_config.disk_image = 'nopaxos'
-                        sequencer[0].pcidevs[0].sync_period = sync_period
+                        nic = sequencer[0].nics[0]
+                        nic.pci_sync_period = nic.eth_sync_period = sync_period
                         sequencer[0].sync_period = sync_period
 
                     replicas = create_basic_hosts(
@@ -124,7 +125,8 @@ for proto_config in proto_configs:
                     for i in range(len(replicas)):
                         replicas[i].node_config.app.index = i
                         replicas[i].node_config.disk_image = 'nopaxos'
-                        replicas[i].pcidevs[0].sync_period = sync_period
+                        nic = replicas[i].nics[0]
+                        nic.pci_sync_period = nic.eth_sync_period = sync_period
                         replicas[i].sync_period = sync_period
 
                     clients = create_basic_hosts(
@@ -147,7 +149,8 @@ for proto_config in proto_configs:
                             c.node_config.app.server_ips.append('10.0.0.100')
                             c.node_config.app.use_ehseq = True
                         c.node_config.disk_image = 'nopaxos'
-                        c.pcidevs[0].sync_period = sync_period
+                        nic = c.nics[0]
+                        nic.pci_sync_period = nic.eth_sync_period = sync_period
                         c.sync_period = sync_period
 
                     clients[num_c - 1].wait = True

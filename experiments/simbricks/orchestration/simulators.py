@@ -103,9 +103,9 @@ class PCIDevSim(Simulator):
         synchronize with connected simulators. For example, this could be used
         when taking checkpoints to only attach certain simulators after the
         checkpoint has been taken."""
-        self.sync_period = 500
-        """Period in nanoseconds of sending synchronization messages from this
-        device to connected components."""
+        self.pci_sync_period = 500
+        """Period in nanoseconds for sending synchronization messages from this
+        device to components connected over PCI."""
         self.pci_latency = 500
         """Latency in nanoseconds for sending messages to components connected
         via PCI."""
@@ -131,6 +131,9 @@ class NICSim(PCIDevSim):
 
         self.network: tp.Optional[NetSim] = None
         self.mac: tp.Optional[str] = None
+        self.eth_sync_period = 500
+        """Synchronization period in nanoseconds for synchronization messages
+        from this NIC to the network component."""
         self.eth_latency = 500
         """Ethernet latency in nanoseconds from this NIC to the network
         component."""
@@ -144,7 +147,8 @@ class NICSim(PCIDevSim):
         cmd = (
             f'{env.dev_pci_path(self)} {env.nic_eth_path(self)}'
             f' {env.dev_shm_path(self)} {self.sync_mode} {self.start_tick}'
-            f' {self.sync_period} {self.pci_latency} {self.eth_latency}'
+            f' {self.pci_sync_period} {self.pci_latency} {self.eth_sync_period}'
+            f' {self.eth_latency}'
         )
         if self.mac is not None:
             cmd += ' ' + (''.join(reversed(self.mac.split(':'))))
@@ -235,6 +239,11 @@ class MemDevSim(NICSim):
         super().__init__()
 
         self.mem_latency = 500
+        """Latency in nanoseconds from this device to the memory component."""
+        self.mem_sync_period = 500
+        """Synchronization period in nanoseconds for synchronization messages
+        from this device to the memory component."""
+
         self.addr = 0xe000000000000000
         self.size = 1024 * 1024 * 1024  # 1GB
         self.as_id = 0
@@ -959,7 +968,7 @@ class BasicMemDev(MemDevSim):
             f'{env.repodir}/sims/mem/basicmem/basicmem'
             f' {self.size} {self.addr} {self.as_id}'
             f' {env.dev_mem_path(self)} {env.dev_shm_path(self)}'
-            f' {self.sync_mode} {self.start_tick} {self.sync_period}'
+            f' {self.sync_mode} {self.start_tick} {self.mem_sync_period}'
             f' {self.mem_latency}'
         )
         return cmd
@@ -977,7 +986,9 @@ class MemNIC(MemDevSim):
         if self.mac is not None:
             cmd += ' ' + (''.join(reversed(self.mac.split(':'))))
 
-        cmd += f' {self.sync_mode} {self.start_tick} {self.sync_period}'
+        # FIXME memnic doesn't allow setting synchronization period for memory
+        # and Ethernet side independently
+        cmd += f' {self.sync_mode} {self.start_tick} {self.mem_sync_period}'
         cmd += f' {self.mem_latency} {self.eth_latency}'
 
         return cmd
@@ -1001,7 +1012,7 @@ class NetMem(NetMemSim):
         if self.mac is not None:
             cmd += ' ' + (''.join(reversed(self.mac.split(':'))))
 
-        cmd += f' {self.sync_mode} {self.start_tick} {self.sync_period}'
+        cmd += f' {self.sync_mode} {self.start_tick} {self.eth_sync_period}'
         cmd += f' {self.eth_latency}'
 
         return cmd

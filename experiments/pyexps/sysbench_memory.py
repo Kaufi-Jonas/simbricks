@@ -146,7 +146,7 @@ for host_type in host_types:
         e.add_host(host)
         host.wait = True
         host.mem_latency = host.sync_period = mem.mem_latency = \
-            mem.sync_period = 500
+            mem.mem_sync_period = 500
 
         if mem_type == 'basicmem':
             host.add_memdev(mem)

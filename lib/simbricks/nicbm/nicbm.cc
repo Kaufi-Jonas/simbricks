@@ -548,24 +548,25 @@ Runner::Runner(Device &dev) : main_time_(0), dev_(dev), events_(EventCmp()) {
 }
 
 int Runner::ParseArgs(int argc, char *argv[]) {
-  if (argc < 4 || argc > 10) {
+  if (argc < 4 || argc > 11) {
     fprintf(stderr,
             "Usage: corundum_bm PCI-SOCKET ETH-SOCKET "
-            "SHM [SYNC-MODE] [START-TICK] [SYNC-PERIOD] [PCI-LATENCY] "
-            "[ETH-LATENCY] [MAC-ADDR]\n");
+            "SHM [SYNC-MODE] [START-TICK] [PCI-SYNC-PERIOD] [PCI-LATENCY] "
+            "[ETH-SYNC-PERIOD] [ETH-LATENCY] [MAC-ADDR]\n");
     return -1;
   }
   if (argc >= 6)
     main_time_ = strtoull(argv[5], NULL, 0);
   if (argc >= 7)
-    netParams_.sync_interval = pcieParams_.sync_interval =
-        strtoull(argv[6], NULL, 0) * 1000ULL;
+    pcieParams_.sync_interval = strtoull(argv[6], NULL, 0) * 1000ULL;
   if (argc >= 8)
     pcieParams_.link_latency = strtoull(argv[7], NULL, 0) * 1000ULL;
   if (argc >= 9)
-    netParams_.link_latency = strtoull(argv[8], NULL, 0) * 1000ULL;
+    netParams_.sync_interval = strtoull(argv[8], NULL, 0) * 1000ULL;
   if (argc >= 10)
-    mac_addr_ = strtoull(argv[9], NULL, 16);
+    netParams_.link_latency = strtoull(argv[9], NULL, 0) * 1000ULL;
+  if (argc >= 11)
+    mac_addr_ = strtoull(argv[10], NULL, 16);
 
   pcieParams_.sock_path = argv[1];
   netParams_.sock_path = argv[2];

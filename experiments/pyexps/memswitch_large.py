@@ -177,7 +177,7 @@ for mem_lat in num_mem_lat:
             mem.addr = 0x2000000000  #0x2000000000000000
             mem.mac = '00:00:00:00:00:' + f'{(i + 1):x}'
             mem.as_id = i
-            mem.sync_period = mem_lat
+            mem.mem_sync_period = mem_lat
             mem.mem_latency = mem_lat
             mems.append(mem)
 

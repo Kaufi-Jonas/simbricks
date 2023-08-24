@@ -112,7 +112,7 @@ for mem_lat in num_mem_lat:
         mem0.addr = 0x2000000000  #0x2000000000000000
         mem0.mac = '00:00:00:00:00:01'
         mem0.as_id = 0
-        mem0.sync_period = mem_lat
+        mem0.mem_sync_period = mem_lat
         mem0.mem_latency = mem_lat
 
         mem1 = sim.MemNIC()
@@ -120,7 +120,7 @@ for mem_lat in num_mem_lat:
         mem1.addr = 0x2000000000  #0x2000000000000000
         mem1.mac = '00:00:00:00:00:02'
         mem1.as_id = 1
-        mem1.sync_period = mem_lat
+        mem1.mem_sync_period = mem_lat
         mem1.mem_latency = mem_lat
 
         mem2 = sim.MemNIC()
@@ -128,7 +128,7 @@ for mem_lat in num_mem_lat:
         mem2.addr = 0x2000000000  #0x2000000000000000
         mem2.mac = '00:00:00:00:00:03'
         mem2.as_id = 2
-        mem2.sync_period = mem_lat
+        mem2.mem_sync_period = mem_lat
         mem2.mem_latency = mem_lat
 
         # Add two NetMes
