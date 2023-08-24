@@ -46,10 +46,11 @@ int SimbricksNicIfCleanup(struct SimbricksNicIf *nicif);
 
 static inline int SimbricksNicIfSync(struct SimbricksNicIf *nicif,
                                      uint64_t cur_ts) {
-  return ((SimbricksNetIfOutSync(&nicif->net, cur_ts) == 0 &&
-           SimbricksPcieIfD2HOutSync(&nicif->pcie, cur_ts) == 0)
-              ? 0
-              : -1);
+  int status = SimbricksNetIfOutSync(&nicif->net, cur_ts);
+  if (status != 0 && status != 1) {
+    return status;
+  }
+  return SimbricksPcieIfD2HOutSync(&nicif->pcie, cur_ts);
 }
 
 static inline uint64_t SimbricksNicIfNextTimestamp(

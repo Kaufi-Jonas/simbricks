@@ -598,8 +598,13 @@ int Runner::RunMain() {
   bool is_sync = sync_pcie || sync_net;
 
   while (!exiting) {
-    while (SimbricksNicIfSync(&nicif_, main_time_)) {
-      fprintf(stderr, "warn: SimbricksNicIfSync failed (t=%lu)\n", main_time_);
+    while (true) {
+      int status = SimbricksNicIfSync(&nicif_, main_time_);
+      if (status == 0 || status == 1) {
+        break;
+      }
+      fprintf(stderr, "warn: SimbricksNicIfSync failed with %d (t=%lu)\n",
+              status, main_time_);
       YieldPoll();
     }
 
