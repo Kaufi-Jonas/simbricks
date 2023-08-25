@@ -77,33 +77,33 @@ lint-clang-format:
 lint-yapf:
 	yapf --recursive --diff \
 		--exclude experiments/simbricks/orchestration/utils/graphlib.py \
-		-- results/ experiments/
+		-- results/ experiments/ tests/
 
 format-yapf:
 	yapf --recursive --in-place \
 		--exclude experiments/simbricks/orchestration/utils/graphlib.py \
 		--exclude experiments/out/ \
-		-- results/ experiments/
+		-- results/ experiments/ tests/
 
 lint-isort:
 	isort --diff \
 		--skip experiments/simbricks/orchestration/utils/graphlib.py \
-		results/ experiments/
+		results/ experiments/ tests/
 
 format-isort:
 	isort --skip experiments/simbricks/orchestration/utils/graphlib.py \
-		results/ experiments/
+		results/ experiments/ tests/
 
 lint-pylint:
 	pylint -d missing-module-docstring,missing-class-docstring \
 		--ignore-paths experiments/simbricks/orchestration/utils/graphlib.py \
-	  	experiments/ results/
+	  	experiments/ results/ tests/
 
 typecheck-python:
 	pytype -j 0 --keep-going \
 		--exclude experiments/pyexps/ae/ \
 			experiments/simbricks/orchestration/utils/graphlib.py \
-		-- experiments/ results/
+		-- experiments/ results/ tests/
 
 lint-python: lint-pylint typecheck-python
 lint: lint-cpplint lint-clang-format lint-python
