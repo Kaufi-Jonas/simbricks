@@ -28,90 +28,113 @@ terms of simulated network throughput and latency.
 """
 
 import simbricks.orchestration.experiments as exp
-import simbricks.orchestration.nodeconfig as node
-import simbricks.orchestration.simulators as sim
-from simbricks.orchestration.simulator_utils import create_basic_hosts
+from simbricks.orchestration import nodeconfig, simulators
 
-host_types = ['qemu', 'gem5', 'qt']
-nic_types = ['i40e', 'cd_bm', 'cd_verilator']
-net_types = ['switch', 'ns3']
+host_types = ['qemu', 'qt', 'gem5', 'simics']
+nic_types = ['i40e', 'e1000', 'cd_bm', 'cd_verilator']
+net_types = ['wire', 'switch', 'ns3_bridge', 'ns3_dumbell']
 experiments = []
+
+
+class QemuTiming(simulators.QemuHost):
+
+    def __init__(self, node_config):
+        super().__init__(node_config)
+        self.sync = True
+
 
 # Create multiple experiments with different simulator permutations, which can
 # be filtered later.
-for host_type in host_types:
-    for nic_type in nic_types:
-        for net_type in net_types:
-            e = exp.Experiment(
-                'netperf-' + host_type + '-' + net_type + '-' + nic_type
-            )
+for host_t in host_types:
+    for nic_t in nic_types:
+        for net_t in net_types:
+            e = exp.Experiment(f'netperf-{host_t}-{nic_t}-{net_t}')
 
-            # network
-            if net_type == 'switch':
-                net = sim.SwitchNet()
-            elif net_type == 'ns3':
-                net = sim.NS3BridgeNet()
-            else:
-                raise NameError(net_type)
-            e.add_network(net)
-
-            # host
-            if host_type == 'qemu':
-                HostClass = sim.QemuHost
-            elif host_type == 'qt':
-
-                def qemu_timing(node_config: node.NodeConfig):
-                    h = sim.QemuHost(node_config)
-                    h.sync = True
-                    return h
-
-                HostClass = qemu_timing
-            elif host_type == 'gem5':
-                HostClass = sim.Gem5Host
+            # host simulator
+            sync = True
+            if host_t == 'qemu':
+                HostClass = simulators.QemuHost
+                sync = False
+            elif host_t == 'qt':
+                HostClass = QemuTiming
+            elif host_t == 'gem5':
+                HostClass = simulators.Gem5Host
+                e.checkpoint = True
+            elif host_t == 'simics':
+                HostClass = simulators.SimicsHost
                 e.checkpoint = True
             else:
-                raise NameError(host_type)
+                raise NameError(f'No host simulator for key {host_t}.')
 
-            # nic
-            if nic_type == 'i40e':
-                NicClass = sim.I40eNIC
-                NcClass = node.I40eLinuxNode
-            elif nic_type == 'cd_bm':
-                NicClass = sim.CorundumBMNIC
-                NcClass = node.CorundumLinuxNode
-            elif nic_type == 'cd_verilator':
-                NicClass = sim.CorundumVerilatorNIC
-                NcClass = node.CorundumLinuxNode
+            # NIC simulator
+            if nic_t == 'i40e':
+                NicClass = simulators.I40eNIC
+                NodeConfigClass = nodeconfig.I40eLinuxNode
+            elif nic_t == 'e1000':
+                NicClass = simulators.E1000NIC
+                NodeConfigClass = nodeconfig.E1000LinuxNode
+            elif nic_t == 'cd_bm':
+                NicClass = simulators.CorundumBMNIC
+                NodeConfigClass = nodeconfig.CorundumLinuxNode
+            elif nic_t == 'cd_verilator':
+                NicClass = simulators.CorundumVerilatorNIC
+                NodeConfigClass = nodeconfig.CorundumLinuxNode
             else:
-                raise NameError(nic_type)
+                raise NameError(f'No NIC simulator for key {nic_t}.')
 
-            # create servers and clients
-            servers = create_basic_hosts(
-                e,
-                1,
-                'server',
-                net,
-                NicClass,
-                HostClass,
-                NcClass,
-                node.NetperfServer
-            )
+            # network simulator
+            if net_t == 'wire':
+                net = simulators.WireNet()
+            elif net_t == 'switch':
+                net = simulators.SwitchNet()
+            elif net_t == 'ns3_bridge':
+                net = simulators.NS3BridgeNet()
+            elif net_t == 'ns3_dumbell':
+                net = simulators.NS3DumbbellNet()
+            else:
+                raise NameError(f'No net simulator for key {net_t}.')
+            if sync:
+                net.sync_mode = 1
+            e.add_network(net)
 
-            clients = create_basic_hosts(
-                e,
-                1,
-                'client',
-                net,
-                NicClass,
-                HostClass,
-                NcClass,
-                node.NetperfClient,
-                ip_start=2
-            )
+            # set up server
+            server_nic = NicClass()
+            server_nic.set_network(net)
+            if sync:
+                server_nic.sync_mode = 1
+            server_nc = NodeConfigClass()
+            server_nc.ip = '10.0.0.1'
+            server_nc.app = nodeconfig.NetperfServer()
 
-            for c in clients:
-                c.wait = True
-                c.node_config.app.server_ip = servers[0].node_config.ip
+            server = HostClass(server_nc)
+            server.name = 'server.0'
+            server.add_nic(server_nic)
+            e.add_nic(server_nic)
+            e.add_host(server)
 
-            # add to experiments
+            # set up client
+            client_nic = NicClass()
+            client_nic.set_network(net)
+            if sync:
+                client_nic.sync_mode = 1
+            client_nc = NodeConfigClass()
+            client_nc.ip = '10.0.0.2'
+            client_nc.app = nodeconfig.NetperfClient()
+            client_nc.app.server_ip = server_nc.ip
+            client_nc.app.duration_tp = client_nc.app.duration_lat = 5
+
+            client = HostClass(client_nc)
+            client.name = 'client.0'
+            client.add_nic(client_nic)
+            e.add_nic(client_nic)
+            e.add_host(client)
+
+            # set more interesting Ethernet latency
+            if sync:
+                latency = 5 * 10**6  # 5 ms
+                net.eth_latency = net.sync_period = latency
+                client_nic.eth_latency = client_nic.eth_sync_period = latency
+                server_nic.eth_latency = server_nic.eth_sync_period = latency
+
+            client.wait = True
             experiments.append(e)
