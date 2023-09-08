@@ -428,6 +428,15 @@ class QemuHost(HostSim):
         return cmd
 
 
+class QemuICountHost(QemuHost):
+    """Qemu host simulator with instruction counting to enable synchronization
+    with connected simulators."""
+
+    def __init__(self, node_config):
+        super().__init__(node_config)
+        self.sync = True
+
+
 class Gem5Host(HostSim):
     """Gem5 host simulator."""
 

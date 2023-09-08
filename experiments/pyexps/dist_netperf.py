@@ -46,13 +46,7 @@ for host_type in host_types:
                 HostClass = sim.QemuHost
                 net.sync = False
             elif host_type == 'qt':
-
-                def qemu_timing(node_config: node.NodeConfig):
-                    h = sim.QemuHost(node_config)
-                    h.sync = True
-                    return h
-
-                HostClass = qemu_timing
+                HostClass = sim.QemuICountHost
             elif host_type == 'gem5':
                 HostClass = sim.Gem5Host
                 e.checkpoint = True

@@ -61,13 +61,7 @@ for proto_config in proto_configs:
                         HostClass = sim.Gem5Host
                         e.checkpoint = True
                     elif host_config == 'qt':
-
-                        def qemu_timing(node_config: node.NodeConfig):
-                            h = sim.QemuHost(node_config)
-                            h.sync = True
-                            return h
-
-                        HostClass = qemu_timing
+                        HostClass = sim.QemuICountHost
                     else:
                         raise NameError(host_config)
 

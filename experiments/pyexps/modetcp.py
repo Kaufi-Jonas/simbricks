@@ -61,13 +61,7 @@ for mode in types_of_mode:
                 if host == 'qemu':
                     HostClass = sim.QemuHost
                 elif host == 'qt':
-
-                    def qemu_timing(node_config: node.NodeConfig):
-                        h = sim.QemuHost(node_config)
-                        h.sync = True
-                        return h
-
-                    HostClass = qemu_timing
+                    HostClass = sim.QemuICountHost
                 elif host == 'gt':
 
                     def gem5_timing(node_config: node.NodeConfig):

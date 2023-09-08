@@ -35,14 +35,6 @@ nic_types = ['i40e', 'e1000', 'cd_bm', 'cd_verilator']
 net_types = ['wire', 'switch', 'ns3_bridge', 'ns3_dumbell']
 experiments = []
 
-
-class QemuTiming(simulators.QemuHost):
-
-    def __init__(self, node_config):
-        super().__init__(node_config)
-        self.sync = True
-
-
 # Create multiple experiments with different simulator permutations, which can
 # be filtered later.
 for host_t in host_types:
@@ -57,7 +49,7 @@ for host_t in host_types:
                 HostClass = simulators.QemuHost
                 sync = False
             elif host_t == 'qt':
-                HostClass = QemuTiming
+                HostClass = simulators.QemuICountHost
             elif host_t == 'gem5':
                 HostClass = simulators.Gem5Host
                 e.checkpoint = True
