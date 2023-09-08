@@ -49,6 +49,7 @@ for host_t in host_types:
     for nic_t in nic_types:
         for net_t in net_types:
             e = exp.Experiment(f'netperf-{host_t}-{nic_t}-{net_t}')
+            e.timeout = 2 * 60 * 60  # two hours
 
             # host simulator
             sync = True
