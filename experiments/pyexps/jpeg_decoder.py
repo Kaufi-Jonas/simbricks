@@ -115,7 +115,7 @@ class JpegDecoderWorkload(node.AppConfig):
 
 
 experiments: tp.List[exp.Experiment] = []
-for host_var in ['gem5_kvm', 'gem5_timing', 'qemu_icount', 'qemu_kvm']:
+for host_var in ['gem5_kvm', 'gem5_timing', 'qemu_icount', 'qemu_kvm', 'dummy']:
     for jpeg_var in ['lpn', 'rtl']:
         e = exp.Experiment(f'jpeg_decoder-{host_var}-{jpeg_var}')
         node_cfg = node.NodeConfig()
@@ -144,6 +144,9 @@ for host_var in ['gem5_kvm', 'gem5_timing', 'qemu_icount', 'qemu_kvm']:
         elif host_var == 'qemu_kvm':
             node_cfg.app.pci_dev = '0000:00:02.0'
             host = sim.QemuHost(node_cfg)
+        elif host_var == 'dummy':
+            host = sim.DummyHost(node_cfg)
+            host.sim_seconds = 10
         else:
             raise NameError(f'Variant {host_var} is unhandled')
         host.wait = True
