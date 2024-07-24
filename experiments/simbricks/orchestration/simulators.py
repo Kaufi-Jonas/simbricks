@@ -745,6 +745,18 @@ class SimicsHost(HostSim):
         return True if env.create_cp else self.wait
 
 
+class DummyHost(HostSim):
+
+    def __init__(self, node_config: NodeConfig) -> None:
+        super().__init__(node_config)
+        self.sim_seconds = 10
+        """Number of seconds to simulate"""
+
+    def run_cmd(self, env: ExpEnv) -> str:
+        assert len(self.pcidevs) == 1
+        return f'{env.repodir}/sims/misc/dummy/dummy_host {env.dev_pci_path(self.pcidevs[0])} {self.sync_period} {self.sim_seconds * 10**12}'
+
+
 class CorundumVerilatorNIC(NICSim):
 
     def __init__(self) -> None:
