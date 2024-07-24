@@ -24,6 +24,7 @@
 from __future__ import annotations
 
 import math
+import os
 import typing as tp
 
 from simbricks.orchestration import e2e_components as e2e
@@ -1164,6 +1165,104 @@ class FEMUDev(PCIDevSim):
             f' {env.dev_pci_path(self)} {env.dev_shm_path(self)}'
         )
         return cmd
+
+
+class XsimDev(PCIDevSim):
+
+    def __init__(
+        self,
+        name: str,
+        clk_freq_mhz: int,
+        vivado_sim_prj_file: str,
+        top_module: str
+    ) -> None:
+        super().__init__()
+        self.name = name
+        self.clk_freq = clk_freq_mhz
+        """Clock frequency in MHz."""
+        self.vivado_sim_prj_file = vivado_sim_prj_file
+        """Path to the .prj file that contains the paths to all Verilog
+        files."""
+        self.top_module = top_module
+        """Name of the top module."""
+        self.write_saif = False
+        """Whether to write .saif files"""
+        self.saif_sampling_period_ns: tp.Optional[int] = None
+        """SAIF sampling period in nanoseconds. When set, a new SAIF file with
+        an incremented suffix is periodically used."""
+        self.saif_sampling_length_ns: tp.Optional[int] = None
+        """If set, every SAIF sample has length saif_sampling_length_ns
+        nanoseconds. Make sure that 0 < saif_sampling_length_ns <=
+        saif_sampling_period_ns."""
+        self.gui = False
+        """Whether to show xsim's GUI."""
+
+    def resreq_mem(self) -> int:
+        return 512  # this is a guess;
+
+    def run_cmd(self, env: ExpEnv) -> str:
+        xsim_workdir = f'{env.workdir}/{self.full_name()}-xsim'
+        os.makedirs(xsim_workdir, exist_ok=True)
+        tcl_path = f'{xsim_workdir}/{self.full_name()}-simbricks_sim.tcl'
+        saif_path_without_suffix = f'{xsim_workdir}/{self.full_name()}'
+        self._write_tcl_script(tcl_path, saif_path_without_suffix)
+        cmds = []
+        cmds.append(f'cd {xsim_workdir}')
+        cmds.append(f'source {env.vivado_installdir}/settings64.sh')
+        cmds.append(
+            f'xelab -O3 -prj {self.vivado_sim_prj_file} --debug wave --sv_root '
+            f'/home/jonask/Repos/vivado_jpgd/simbricks --sv_lib xsim_adapter '
+            f'-s simbricks_sim --incr -L unisims_ver --generic_top '
+            f'"SIMBRICKS_PCI_SOCKET={env.dev_pci_path(self)}" --generic_top '
+            f'"SHM_PATH={env.dev_shm_path(self)}" --generic_top '
+            f'"SYNC_PERIOD={self.sync_period}" --generic_top '
+            f'"CLK_FREQ_MHZ={self.clk_freq}" --generic_top '
+            f'"PCI_LATENCY={self.pci_latency}" '
+            f'xil_defaultlib.{self.top_module} xil_defaultlib.glbl'
+        )
+        gui_param = '--gui' if self.gui else ''
+        cmds.append(f'xsim {gui_param} --tclbatch {tcl_path} simbricks_sim')
+        cmd = ' && '.join(cmds)
+        return f'bash -c \'{cmd}\''
+
+    def _write_tcl_script(
+        self, tcl_path: str, saif_path_without_suffix: str
+    ) -> None:
+        lines = []
+        if self.saif_sampling_period_ns is not None:
+            if self.saif_sampling_length_ns is not None:
+                lines.extend([
+                    'for {set i 0} {1} {incr i} {\n',
+                    f'  open_saif {saif_path_without_suffix}-'
+                    '${i}.saif\n',
+                    '  log_saif [get_objects -r *]\n'
+                ])
+
+                if self.saif_sampling_length_ns is not None:
+                    if not 0 < self.saif_sampling_length_ns <= self.saif_sampling_period_ns:
+                        raise RuntimeError(
+                            f'The following has to hold for saif_sampling_length_ns: 0 < saif_sampling_length_ns <= saif_sampling_period_ns'
+                        )
+                    lines.append(f'  run {self.saif_sampling_length_ns} ns\n')
+                else:
+                    lines.append(f'  run {self.saif_sampling_period_ns}\n')
+
+                lines.append('  close_saif\n')
+
+                if self.saif_sampling_length_ns is not None:
+                    lines.append(
+                        f'  run {self.saif_sampling_period_ns - self.saif_sampling_length_ns} ns\n'
+                    )
+
+                lines.append('}\n')
+        else:
+            lines.append('run all\n')
+
+        if not self.gui:
+            lines.append('quit\n')
+
+        with open(tcl_path, mode='w', encoding='utf-8') as file:
+            file.writelines(lines)
 
 
 class BasicMemDev(MemDevSim):
