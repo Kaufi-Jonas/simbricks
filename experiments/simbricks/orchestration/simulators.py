@@ -1167,6 +1167,26 @@ class FEMUDev(PCIDevSim):
         return cmd
 
 
+class JpegDecoderDev(PCIDevSim):
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.start_tick = 0
+        self.name = 'jpeg_decoder'
+        self.variant = 'jpeg_decoder_verilator'
+
+    def resreq_mem(self) -> int:
+        return 512  # this is a guess
+
+    def run_cmd(self, env: ExpEnv) -> str:
+        return (
+            f'{env.repodir}/sims/misc/jpeg_decoder/{self.variant} '
+            f'{env.dev_pci_path(self)} {env.dev_shm_path(self)} '
+            f'{self.start_tick} {self.sync_period} {self.pci_latency} '
+            f'{env.outdir}/{self.name}_dump '
+        )
+
+
 class XsimDev(PCIDevSim):
 
     def __init__(
