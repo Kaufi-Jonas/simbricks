@@ -26,7 +26,7 @@ import simbricks.orchestration.simulators as sim
 
 experiments = []
 
-for h in ['qk', 'qt', 'gk', 'gt']:
+for h in ['qk', 'qt', 'gk', 'gt', 'dummy']:
     for vta_var in ['lpn', 'rtl']:
         print("running")
         e = exp.Experiment('vtatest-' + h + '-' + vta_var)
@@ -49,6 +49,9 @@ for h in ['qk', 'qt', 'gk', 'gt']:
         elif h == 'qt':
             host = sim.QemuHost(node_config)
             host.sync = True
+        elif h == 'dummy':
+            host = sim.DummyHost(node_config)
+            host.sim_seconds = 10
         host.name = 'host.0'
         e.add_host(host)
         host.wait = True
