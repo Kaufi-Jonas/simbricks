@@ -123,11 +123,13 @@ for host_var in ['gem5_kvm', 'gem5_timing', 'qemu_icount', 'qemu_kvm', 'dummy']:
         dma_src = 1 * 1024**3
         dma_dst = dma_src + 10 * 1024**2
         node_cfg.memory = 2 * 1024
-        images = glob.glob('../sims/misc/jpeg_decoder/test_img/420/*.jpg')
+        images = glob.glob(
+            '../sims/misc/jpeg_decoder/test_img/444_optimized/medium.jpg'
+        )
         images.sort()
         # images = images[:len(images) // 2]  # only decode half of them
         node_cfg.app = JpegDecoderWorkload(
-            '0000:00:00.0', images, dma_src, dma_dst, False
+            '0000:00:00.0', images, dma_src, dma_dst, debug=False
         )
 
         if host_var == 'gem5_kvm':
@@ -172,6 +174,6 @@ for host_var in ['gem5_kvm', 'gem5_timing', 'qemu_icount', 'qemu_kvm', 'dummy']:
         e.add_pcidev(jpeg_dev)
 
         host.pci_latency = host.sync_period = jpeg_dev.pci_latency = \
-            jpeg_dev.sync_period = 400
+            jpeg_dev.sync_period = 200
 
         experiments.append(e)
