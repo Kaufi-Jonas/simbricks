@@ -1130,6 +1130,7 @@ class JpegDecoderDev(PCIDevSim):
             f'{env.outdir}/{self.name}_dump '
         )
 
+
 class XsimDev(PCIDevSim):
 
     def __init__(
