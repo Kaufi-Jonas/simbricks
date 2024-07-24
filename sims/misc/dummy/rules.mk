@@ -1,4 +1,4 @@
-# Copyright 2023 Max Planck Institute for Software Systems, and
+# Copyright 2024 Max Planck Institute for Software Systems, and
 # National University of Singapore
 #
 # Permission is hereby granted, free of charge, to any person obtaining
@@ -22,8 +22,12 @@
 
 include mk/subdir_pre.mk
 
-$(eval $(call subdir,gcd))
-$(eval $(call subdir,jpeg_decoder))
-$(eval $(call subdir,dummy))
+bin_dummy_host := $(d)dummy_host
+
+$(bin_dummy_host): $(bin_dummy_host).o $(lib_base) $(lib_pcie)
+
+CLEAN := $(bin_dummy_host)
+
+ALL := $(bin_dummy_host) $(bin_dummy_host).o
 
 include mk/subdir_post.mk
