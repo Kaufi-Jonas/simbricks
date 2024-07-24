@@ -19,8 +19,8 @@
 # CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 # SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-import os
 import glob
+import os
 import typing as tp
 
 from PIL import Image
@@ -54,12 +54,15 @@ class JpegDecoderWorkload(node.AppConfig):
             'mount -t sysfs sysfs /sys',
             'echo 1 >/sys/module/vfio/parameters/enable_unsafe_noiommu_mode',
             'echo "dead beef" >/sys/bus/pci/drivers/vfio-pci/new_id',
+            f'dd if=/tmp/guest/{os.path.basename(self.images[0])} bs=4096 '
+            f'of=/dev/mem seek={self.dma_src_addr} oflag=seek_bytes '
         ]
 
     def run_cmds(self, node: NodeConfig) -> tp.List[str]:
         # enable vfio access to JPEG decoder
         cmds = []
 
+        first = True
         for img in self.images:
             with Image.open(img) as loaded_img:
                 width, height = loaded_img.size
@@ -67,7 +70,7 @@ class JpegDecoderWorkload(node.AppConfig):
             cmds.extend([
                 f'echo starting decode of image {os.path.basename(img)}',
                 # copy image into memory
-                (
+                '' if first else (
                     f'dd if=/tmp/guest/{os.path.basename(img)} bs=4096 '
                     f'of=/dev/mem seek={self.dma_src_addr} oflag=seek_bytes '
                 ),
@@ -79,6 +82,9 @@ class JpegDecoderWorkload(node.AppConfig):
                 ),
                 f'echo finished decode of image {os.path.basename(img)}',
             ])
+
+            if first:
+                first = False
 
             if self.debug:
                 # dump the image as base64 to stdout
