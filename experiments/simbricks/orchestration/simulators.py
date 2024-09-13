@@ -589,6 +589,9 @@ class SimicsHost(HostSim):
         """
         self.debug_messages = False
         """Whether to enable debug messages of SimBricks adapter devices."""
+        self.start_ts = 0
+        """Only start SimBricks synchronization at this timestamp. Unit is
+        picoseconds."""
 
     def resreq_cores(self) -> int:
         return 2
@@ -708,7 +711,8 @@ class SimicsHost(HostSim):
                 f'-e \'$pci = (create-simbricks-pcie-comp '
                 f'socket = "{env.dev_pci_path(pcidev)}" '
                 f'pci_latency = {self.pci_latency} '
-                f'sync_period = {self.sync_period})\' '
+                f'sync_period = {self.sync_period} '
+                f'start_ts = {self.start_ts})\' '
             )
             cmd += f'-e \'connect board.mb.nb.pci_slot[{i}] $pci.pci_bus\' '
             cmd += '-e instantiate-components '

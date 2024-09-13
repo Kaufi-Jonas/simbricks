@@ -43,6 +43,7 @@ class simbricks_pcie_comp(StandardComponent):
         simbricks_pcie_dev.socket = self.socket.val
         simbricks_pcie_dev.pci_latency = self.pci_latency.val
         simbricks_pcie_dev.sync_period = self.sync_period.val
+        simbricks_pcie_dev.start_ts = self.start_ts.val
 
     def add_connectors(self):
         self.add_connector(
@@ -71,6 +72,11 @@ class simbricks_pcie_comp(StandardComponent):
     ):
         """Period for sending SimBricks synchronization messages in
         nanoseconds."""
+
+    class start_ts(
+        SimpleConfigAttribute(None, 'i', simics.Sim_Attr_Required)
+    ):
+        """Timestamp in ps when to start sending sync messages"""
 
     class component_connector(Interface):
         """Uses connector for handling connections between components."""

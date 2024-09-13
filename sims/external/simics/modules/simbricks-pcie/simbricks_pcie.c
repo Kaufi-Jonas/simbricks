@@ -98,6 +98,7 @@ typedef struct {
   const char *socket_path; /* path to ux socket to connect to */
   uint64 pci_latency;
   uint64 sync_period;
+  uint64 start_ts;
 
   bool debug_prints;
   bool verbose;
@@ -140,6 +141,10 @@ static inline uint64_t ceil_power_of_2(uint64_t len) {
   long double log_len = ceill(log2l(len));
   ASSERT(log_len >= 4); /* makes masking easier */
   return (uint64_t)powl(2, log_len);
+}
+
+static inline uint64_t max(uint64_t a, uint64_t b) {
+  return a > b ? a : b;
 }
 
 /* mask values in BAR registers to indicate size and set lower bit to indicate
@@ -306,7 +311,8 @@ static int simbricks_connect(simbricks_pcie_t *simbricks) {
       SIM_LOG_CRITICAL(&simbricks->obj, 1, "sending initial sync failed");
       return 0;
     }
-    first_sync_ts = SimbricksPcieIfH2DOutNextSync(&simbricks->pcie_if);
+    first_sync_ts = max(simbricks->start_ts,
+                        SimbricksPcieIfH2DOutNextSync(&simbricks->pcie_if));
 
     SIM_LOG_INFO(4, &simbricks->obj, 1, "first_sync_ts: %llu", first_sync_ts);
 
@@ -326,8 +332,8 @@ static int simbricks_connect(simbricks_pcie_t *simbricks) {
                          &simbricks->obj,
                          rel_to_current_proto(simbricks, first_sync_ts), NULL);
     SIM_event_post_cycle(simbricks->pico_second_clock, poll_event,
-                         &simbricks->obj,
-                         rel_to_current_proto(simbricks, first_sync_ts), NULL);
+                         &simbricks->obj, rel_to_current_proto(simbricks, 0),
+                         NULL);
   } else {
     SIM_LOG_CRITICAL(&simbricks->obj, 1,
                      "Running unsynchronized not implemented");
@@ -897,6 +903,20 @@ static set_error_t set_sync_period_attr(conf_object_t *obj,
   return Sim_Set_Ok;
 }
 
+static attr_value_t get_start_ts_attr(conf_object_t *obj) {
+  simbricks_pcie_t *simbricks = (simbricks_pcie_t *)obj;
+  return SIM_make_attr_uint64(simbricks->start_ts);
+}
+static set_error_t set_start_ts_attr(conf_object_t *obj,
+                                     attr_value_t *attr_val) {
+  simbricks_pcie_t *simbricks = (simbricks_pcie_t *)obj;
+  if (!SIM_attr_is_uint64(*attr_val)) {
+    return Sim_Set_Illegal_Value;
+  }
+  simbricks->start_ts = SIM_attr_integer(*attr_val);
+  return Sim_Set_Ok;
+}
+
 /******************************************************************************/
 /* Simics Initialization */
 
@@ -988,6 +1008,9 @@ void init_local(void) {
                          "PCI Latency in ns from host to device");
   SIM_register_attribute(
       pcie_cls, "sync_period", get_sync_period_attr, set_sync_period_attr,
-      Sim_Attr_Optional, "i",
+      Sim_Attr_Required, "i",
       "Period for sending SimBricks synchronization messages in nanoseconds.");
+  SIM_register_attribute(pcie_cls, "start_ts", get_start_ts_attr,
+                         set_start_ts_attr, Sim_Attr_Required, "i",
+                         "Timestamp in ps when to start sending sync messages");
 }
