@@ -1200,3 +1200,22 @@ class NetMem(NetMemSim):
         cmd += f' {self.eth_latency}'
 
         return cmd
+
+
+class VTADev(PCIDevSim):
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.clock_freq = 100
+        self.batch = 1
+        self.block = 16
+        """Clock frequency in MHz"""
+
+    def run_cmd(self, env):
+        cmd = (
+            f"{env.repodir}/sims/external/vta/simbricks/vta_simbricks-{self.batch}x{self.block} "
+            f"{env.dev_pci_path(self)} {env.dev_shm_path(self)} "
+            f"{self.start_tick} {self.sync_period} {self.pci_latency} "
+            f"{self.clock_freq}"
+        )
+        return cmd
