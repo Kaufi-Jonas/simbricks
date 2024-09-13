@@ -568,7 +568,7 @@ static void simbricks_comm_d2h_process(
   SimbricksPcieIfD2HInDone(&simbricks->pcie_if, msg);
 }
 
-/* sync event callback for sending synchronization messages to memory */
+/* sync event callback for sending synchronization messages to PCIe device */
 static void sync_event_callback(conf_object_t *obj, lang_void *data) {
   simbricks_pcie_t *simbricks = (simbricks_pcie_t *)obj;
   cycles_t cur_ts = SIM_cycle_count(simbricks->pico_second_clock);
@@ -605,10 +605,9 @@ static void poll_event_callback(conf_object_t *obj, lang_void *data) {
   simbricks_pcie_t *simbricks = (simbricks_pcie_t *)obj;
   int64 cur_ts = SIM_cycle_count(simbricks->pico_second_clock);
   uint64 proto_ts = ts_to_proto(simbricks, cur_ts);
-  uint64 next_ts;
+  uint64 next_ts = 0;
 
   volatile union SimbricksProtoPcieD2H *msg;
-  volatile union SimbricksProtoPcieD2H *next_msg;
 
   uint64 poll_ts = SimbricksPcieIfD2HInTimestamp(&simbricks->pcie_if);
   if (proto_ts > poll_ts + 1 || proto_ts < poll_ts) {
@@ -624,28 +623,19 @@ static void poll_event_callback(conf_object_t *obj, lang_void *data) {
                                          sync_event, obj, NULL, NULL));
 #endif
 
-  /* poll until we have a message (should not usually spin) */
-  do {
-    msg = SimbricksPcieIfD2HInPoll(&simbricks->pcie_if, proto_ts);
-  } while (msg == NULL);
-
-  simbricks_comm_d2h_process(simbricks, cur_ts, msg);
-
-  /* process additional available messages */
+  /* process all available messages and find timestamp when to schedule next
+  poll event */
   for (;;) {
     msg = SimbricksPcieIfD2HInPoll(&simbricks->pcie_if, proto_ts);
-    if (msg == NULL) {
+    if (msg != NULL) {
+      simbricks_comm_d2h_process(simbricks, cur_ts, msg);
+      continue;
+    }
+    next_ts = SimbricksPcieIfD2HInTimestamp(&simbricks->pcie_if);
+    if (proto_ts < next_ts) {
       break;
     }
-    simbricks_comm_d2h_process(simbricks, cur_ts, msg);
   }
-
-  /* Wait for next message so we know its timestamp and when to schedule the
-   * timer. */
-  do {
-    next_msg = SimbricksPcieIfD2HInPeek(&simbricks->pcie_if, proto_ts);
-    next_ts = SimbricksPcieIfD2HInTimestamp(&simbricks->pcie_if);
-  } while (!next_msg && next_ts <= proto_ts);
 
   /* set timer for next message */
   SIM_event_post_cycle(simbricks->pico_second_clock, poll_event,
