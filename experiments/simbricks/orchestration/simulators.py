@@ -700,7 +700,7 @@ class SimicsHost(HostSim):
                 f'{memdev.addr:#x} {memdev.size:#x}\' '
             )
             if self.debug_messages:
-                cmd += '-e \'$mem.log-level 3\' '
+                cmd += '-e \'$mem.log-level 4\' '
 
         if self.pcidevs:
             cmd += '-e \'load-module simbricks_pcie_comp\' '
@@ -717,7 +717,7 @@ class SimicsHost(HostSim):
             cmd += f'-e \'connect board.mb.nb.pci_slot[{i}] $pci.pci_bus\' '
             cmd += '-e instantiate-components '
             if self.debug_messages:
-                cmd += '-e \'$pci.log-level 3\' '
+                cmd += '-e \'$pci.log-level 4\' '
             i += 1
 
         for param in self.append_cmdline:
