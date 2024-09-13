@@ -61,7 +61,7 @@ def parse_args() -> argparse.Namespace:
         '--filter',
         metavar='PATTERN',
         type=str,
-        nargs='+',
+        action='append',
         help='Only run experiments matching the given Unix shell style patterns'
     )
     parser.add_argument(
@@ -357,6 +357,8 @@ def main():
 
                 if not match:
                     continue
+
+            print(e.name)
 
             # if this is an experiment with a checkpoint we might have to create
             # it
