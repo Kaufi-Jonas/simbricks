@@ -683,7 +683,7 @@ class SimicsHost(HostSim):
         # Only simulate one cycle per CPU and then switch to the next. This is
         # necessary for the synchronization of the SimBricks adapter with all
         # the CPUs to work properly.
-        cmd += '-e \'set-time-quantum 1\' '
+        cmd += f'-e \'set-time-quantum seconds = {self.sync_period / 10 ** 9:.9f}\' '
 
         if self.memdevs:
             cmd += '-e \'load-module simbricks_mem_comp\' '
