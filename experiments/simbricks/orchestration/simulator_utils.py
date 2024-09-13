@@ -53,7 +53,7 @@ def create_basic_hosts(
     hosts: tp.List[HostSim] = []
     for i in range(0, num):
         nic = nic_class()
-        #nic.name = '%s.%d' % (name_prefix, i)
+        nic.name = '0'
         nic.set_network(net)
 
         node_config = nc_class()
