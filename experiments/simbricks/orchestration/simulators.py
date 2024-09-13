@@ -608,7 +608,7 @@ class SimicsHost(HostSim):
         if self.interactive and not env.create_cp:
             cmd = f'{env.simics_gui_path} -q '
         else:
-            cmd = f'{env.simics_path} -q -batch-mode -werror '
+            cmd = f'{env.simics_path} -q -batch-mode '
 
         if env.restore_cp:
             # restore checkpoint
