@@ -22,6 +22,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+#include "simbricks/base/proto.h"
 #define VERBOSE_DEBUG_PRINTS 0
 #define INTERRUPT_DISABLE_BIT 1 << 10
 #define INTERRUPT_STATUS_BIT 1 << 3
@@ -917,6 +918,37 @@ static set_error_t set_start_ts_attr(conf_object_t *obj,
   return Sim_Set_Ok;
 }
 
+static attr_value_t get_notify_exit_attr(conf_object_t *obj) {
+  return SIM_make_attr_uint64(0);
+}
+static set_error_t set_notify_exit_attr(conf_object_t *obj,
+                                     attr_value_t *attr_val) {
+  if (!SIM_attr_is_uint64(*attr_val)) {
+    return Sim_Set_Illegal_Value;
+  }
+  if (!SIM_attr_integer(*attr_val)) {
+    return Sim_Set_Ok;
+  }
+
+  simbricks_pcie_t *simbricks = (simbricks_pcie_t *)obj;
+  cycles_t cur_ts = SIM_cycle_count(simbricks->pico_second_clock);
+  SIM_LOG_INFO(1, obj, 1, "Cleaning up SimBricks adapter ...");
+
+  /* send termination message */
+  volatile union SimbricksProtoPcieH2D *msg =
+      simbricks_comm_h2d_alloc(simbricks, cur_ts);
+  SimbricksPcieIfH2DOutSend(&simbricks->pcie_if, msg,
+                            SIMBRICKS_PROTO_MSG_TYPE_TERMINATE);
+
+  /* cancel all events */
+  SIM_event_cancel_time(simbricks->pico_second_clock, sync_event,
+                        &simbricks->obj, NULL, NULL);
+  SIM_event_cancel_time(simbricks->pico_second_clock, poll_event,
+                        &simbricks->obj, NULL, NULL);
+  simbricks->start_ts = SIM_attr_integer(*attr_val);
+  return Sim_Set_Ok;
+}
+
 /******************************************************************************/
 /* Simics Initialization */
 
@@ -964,9 +996,9 @@ static void objects_finalized(conf_object_t *obj) {
 
 /* Free memory allocated for the object. */
 static void dealloc_object(conf_object_t *obj) {
-  simbricks_pcie_t *empty = (simbricks_pcie_t *)obj;
-  SIM_free_map_target(empty->memory_target);
-  MM_FREE(empty);
+  simbricks_pcie_t *simbricks = (simbricks_pcie_t *)obj;
+  SIM_free_map_target(simbricks->memory_target);
+  MM_FREE(simbricks);
 }
 
 /* Called once when the device module is loaded into Simics. */
@@ -1013,4 +1045,7 @@ void init_local(void) {
   SIM_register_attribute(pcie_cls, "start_ts", get_start_ts_attr,
                          set_start_ts_attr, Sim_Attr_Required, "i",
                          "Timestamp in ps when to start sending sync messages");
+  SIM_register_attribute(pcie_cls, "notify_exit", get_notify_exit_attr,
+                         set_notify_exit_attr, Sim_Attr_Pseudo, "i",
+                         "Set this to 1 before Simics exits so that cleanup code can run");
 }

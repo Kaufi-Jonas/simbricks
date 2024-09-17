@@ -732,7 +732,15 @@ class SimicsHost(HostSim):
             'substr="Sleep state is unimplemented" type=unimpl\' '
         )
 
-        return cmd + '-e run'
+        cmd += '-e run '
+
+        # invoke cleanup code in SimBricks adapters
+        for i in range(len(self.pcidevs)):
+            cmd += (
+                f'-e \'python "SIM_get_object(\\"simbricks_pcie{i}.simbricks_pcie_dev\\").notify_exit = 1"\' '
+            )
+
+        return cmd
 
     def wait_terminate(self, env: ExpEnv) -> bool:
         return True if env.create_cp else self.wait
