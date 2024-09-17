@@ -137,6 +137,7 @@ class Runner {
   const char *shmPath_;
   struct SimbricksNicIf nicif_;
   struct SimbricksProtoPcieDevIntro dintro_;
+  bool exiting_ = false;
 
   sim_log::LogPtT log_ = sim_log::Log::createLog();
 

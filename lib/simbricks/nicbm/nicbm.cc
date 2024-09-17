@@ -424,6 +424,8 @@ void Runner::PollH2D() {
   }
 #endif
 
+  volatile union SimbricksProtoNetMsg *terminate_msg = NULL;
+
   type = SimbricksPcieIfH2DInType(&nicif_.pcie, msg);
   switch (type) {
     case SIMBRICKS_PROTO_PCIE_H2D_MSG_READ:
@@ -461,6 +463,11 @@ void Runner::PollH2D() {
 
     case SIMBRICKS_PROTO_MSG_TYPE_TERMINATE:
       sim_log::LogError("poll_h2d: peer terminated\n");
+      std::cout << "poll_h2d: peer terminated" << std::endl;
+      exiting = true;
+      terminate_msg = D2NAlloc();
+      SimbricksNetIfOutSend(&nicif_.net, terminate_msg,
+                            SIMBRICKS_PROTO_MSG_TYPE_TERMINATE);
       break;
 
     default:
