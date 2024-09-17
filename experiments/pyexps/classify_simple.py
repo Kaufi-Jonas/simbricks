@@ -69,7 +69,7 @@ class TvmClassifyLocal(node.AppConfig):
         # define commands to run on simulated server
         cmds = [
             # start RPC server
-            f"VTA_DEVICE=0000:00:{(self.pci_vta_id):02d}.0 python3 -m"
+            f"VTA_DEVICE=0000:00:{(self.pci_vta_id):02x}.0 python3 -m"
             " vta.exec.rpc_server &"
             # wait for RPC server to start
             "sleep 6",
@@ -140,7 +140,7 @@ for (
     core_opts
 ):
     experiment = exp.Experiment(
-        f"classify_simple-{model_name}-{inference_device.value}-{host_var}-{cores}-{vta_clk_freq}-{vta_batch}x{vta_block}"
+        f"cs-{model_name}-{inference_device.value}-{host_var}-{cores}-{vta_clk_freq}-{vta_batch}x{vta_block}"
     )
     pci_vta_id = 2
     sync = False
@@ -156,6 +156,7 @@ for (
         sync = True
     elif host_var == "simics":
         HostClass = sim.SimicsHost
+        pci_vta_id = 0x0b
 
     # Instantiate server
     server_cfg = VtaNode()
@@ -185,7 +186,7 @@ for (
         server.add_pcidev(vta)
         if host_var == "simics":
             server.debug_messages = False
-            server.start_ts = vta.start_tick = int(60 * 10**12)
+            server.start_ts = vta.start_tick = int(63 * 10**12)
 
     server.pci_latency = server.sync_period = vta.pci_latency = (
         vta.sync_period

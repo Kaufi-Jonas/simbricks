@@ -8,28 +8,29 @@ import itertools
 
 experiments = []
 
+start_tick = int(67 * 10**12)
+
 link_rate = 1  # Gbps
 link_latency = 5  # ms
 bdp = int(link_rate * link_latency / 1000 * 10**9)  # Bandwidth-delay product
-queue_size = bdp * 2
+queue_size = bdp
 mtu = 1500
 
-host_variants = ["qk", "qt"]
-num_clients_opts = [1, 4, 12]
-num_servers_opts = [1, 2, 4, 6]
+host_variants = ["qk", "qt", "s"]
+num_clients_opts = [20]
+num_servers_opts = [4]
 inference_device_opts = [
     node.TvmDeviceType.VTA,
     node.TvmDeviceType.CPU,
     node.TvmDeviceType.CPU_AVX512,
 ]
-vta_clk_freq_opts = [100, 400]
-vta_batch_opts = [1, 4, 8]
-vta_block_opts = [16, 32]
+vta_clk_freq_opts = [100, 200, 400, 800]
+vta_batch_opts = [1]
+vta_block_opts = [16]
 model_name_opts = [
     "resnet18_v1",
     "resnet34_v1",
     "resnet50_v1",
-    "resnet101_v1",
 ]
 
 for (
@@ -52,19 +53,23 @@ for (
     model_name_opts,
 ):
     experiment = exp.Experiment(
-        f"classify_dist-{model_name}-{inference_device.value}-{host_var}-{num_servers}s-{num_clients}c-{vta_clk_freq}-{vta_batch}x{vta_block}"
+        f"cd-{model_name}-{inference_device.value}-{host_var}-{num_servers}-{num_clients}-{vta_clk_freq}-{vta_batch}x{vta_block}"
     )
     pci_vta_id_start = 1
     sync = False
-    if host_var == "qemu_k":
+    if host_var == "qk":
         HostClass = sim.QemuHost
         pci_vta_id_start = 3
-    elif host_var == "qemu_i":
+    elif host_var == "qt":
         HostClass = sim.QemuIcountHost
         pci_vta_id_start = 3
         sync = True
     elif host_var == "gem5":
         HostClass = sim.Gem5Host
+        sync = True
+    elif host_var == "s":
+        HostClass = sim.SimicsHost
+        pci_vta_id_start = 0x0c
         sync = True
 
     # instantiate network
@@ -83,9 +88,9 @@ for (
         1,
         "tvm_tracker",
         net,
-        sim.I40eNIC,
+        sim.E1000NIC,
         HostClass,
-        node.i40eLinuxTvmNode,
+        node.E1000LinuxTvmNode,
         node.TvmTracker,
     )[0]
     tracker_net = e2e.E2ESimbricksHost(tracker.full_name())
@@ -104,21 +109,25 @@ for (
         num_servers,
         "vta_server",
         net,
-        sim.I40eNIC,
+        sim.E1000NIC,
         HostClass,
-        node.i40eLinuxVtaNode,
+        node.E1000LinuxVtaNode,
         object,
         2,
     )
     for i in range(len(servers)):
         app = node.VtaRpcServerWTracker()
         app.tracker_host = tracker.node_config.ip
-        app.pci_device_id = f"0000:00:{(pci_vta_id_start):02d}.0"
+        app.pci_device_id = f"0000:00:{(pci_vta_id_start):02x}.0"
         servers[i].node_config.app = app
 
         vta = sim.VTADev()
         vta.name = f"vta{i}"
         vta.clock_freq = vta_clk_freq
+        vta.batch = vta_batch
+        vta.block = vta_block
+        if host_var == "s":
+            vta.start_tick = start_tick
         servers[i].add_pcidev(vta)
         experiment.add_pcidev(vta)
 
@@ -138,27 +147,35 @@ for (
         num_clients,
         "tvm_client",
         net,
-        sim.I40eNIC,
+        sim.E1000NIC,
         HostClass,
-        node.i40eLinuxTvmClassifyNode,
+        node.E1000LinuxTvmClassifyNode,
         object,
         2 + num_servers,
     )
+    seed = 0
     for client in clients:
-        app = node.TvmDetectWTracker()
+        app = node.TvmClassifyWTracker()
+        app.model_name = model_name
+        app.repetitions = 3
+        app.batch_size = 4
+        app.vta_batch = vta_batch
+        app.vta_block = vta_block
         app.tracker_host = tracker.node_config.ip
         app.device = inference_device
+        app.seed = seed
+        seed = seed + 1
         client.node_config.app = app
         client.wait = True
 
-        client_net = e2e.E2ESimbricksHost(clients[i].full_name())
+        client_net = e2e.E2ESimbricksHost(client.full_name())
         client_net.eth_latency = "1us"
         client_net.sync = (
             e2e.SimbricksSyncMode.SYNC_REQUIRED
             if sync
             else e2e.SimbricksSyncMode.SYNC_DISABLED
         )
-        client_net.simbricks_component = clients[i].nics[0]
+        client_net.simbricks_component = client.nics[0]
         topology.add_left_component(client_net)
 
     # either globally synchronize
@@ -166,6 +183,13 @@ for (
         dev.sync_mode = 1 if sync else 0
     for host in experiment.hosts:
         host.node_config.nockp = not experiment.checkpoint
+
+    if host_var == "s":
+        for host_sim in itertools.chain(servers, clients, [tracker]):
+                host_sim.start_ts = start_tick
+                host_sim.node_config.disk_image = "vta_classification-simics"
+                host_sim.node_config.kcmd_append = ""
+                host_sim.nics[0].start_tick = start_tick
 
     net.init_network()
     experiments.append(experiment)

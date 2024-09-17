@@ -904,7 +904,8 @@ class i40eLinuxTvmNode(I40eLinuxNode):
     def __init__(self):
         super().__init__()
         self.disk_image = 'vta'
-        self.memory = 1024
+        self.memory = 4096
+        self.cores = 4
 
     def prepare_pre_cp(self):
         cmds = super().prepare_pre_cp()
@@ -916,6 +917,28 @@ class i40eLinuxTvmNode(I40eLinuxNode):
             'export PYTHONPATH=/root/tvm/vta/python:${PYTHONPATH}',
             # Otherwise, might get warnings of SYN flood, which drops requests
             'sysctl -w net.ipv4.tcp_max_syn_backlog=4096'
+        ])
+        return cmds
+
+class E1000LinuxTvmNode(E1000LinuxNode):
+
+    def __init__(self):
+        super().__init__()
+        self.disk_image = 'vta'
+        self.memory = 4096
+        self.cores = 4
+
+    def prepare_pre_cp(self):
+        cmds = super().prepare_pre_cp()
+        cmds.extend([
+            'mount -t proc proc /proc',
+            'mount -t sysfs sysfs /sys',
+            'cd /root/tvm/',
+            'export PYTHONPATH=/root/tvm/python:${PYTHONPATH}',
+            'export PYTHONPATH=/root/tvm/vta/python:${PYTHONPATH}',
+            # Otherwise, might get warnings of SYN flood, which drops requests
+            'sysctl -w net.ipv4.tcp_max_syn_backlog=4096',
+            'sysctl -w net.core.somaxconn=4096'
         ])
         return cmds
 
@@ -940,12 +963,38 @@ class i40eLinuxTvmClassifyNode(i40eLinuxTvmNode):
         ])
         return cmds
 
+class E1000LinuxTvmClassifyNode(E1000LinuxTvmNode):
+
+    def __init__(self):
+        super().__init__()
+        self.disk_image = 'vta_classification'
+
+    def prepare_pre_cp(self):
+        cmds = super().prepare_pre_cp()
+        cmds.extend([
+            "export MXNET_HOME=/root/mxnet",
+        ])
+        return cmds
+
 
 class i40eLinuxVtaNode(i40eLinuxTvmNode):
 
     def __init__(self):
         super().__init__()
-        self.memory = 3 * 1024
+        self.kcmd_append = ' memmap=512M!1G'
+
+    def prepare_pre_cp(self):
+        cmds = super().prepare_pre_cp()
+        cmds.extend([
+            'echo 1 >/sys/module/vfio/parameters/enable_unsafe_noiommu_mode',
+            'echo "dead beef" >/sys/bus/pci/drivers/vfio-pci/new_id',
+        ])
+        return cmds
+
+class E1000LinuxVtaNode(E1000LinuxTvmNode):
+
+    def __init__(self):
+        super().__init__()
         self.kcmd_append = ' memmap=512M!1G'
 
     def prepare_pre_cp(self):
@@ -1065,10 +1114,12 @@ class TvmDetectWTracker(AppConfig):
         return cmds
 
 
-class TvmDetectWTracker(AppConfig):
+class TvmClassifyWTracker(AppConfig):
 
     def __init__(self) -> None:
         super().__init__()
+        self.tracker_host = '10.0.0.1'
+        self.tracker_port = 9190
         self.pci_vta_id = 0
         self.device = TvmDeviceType.VTA
         self.repetitions = 1
@@ -1076,6 +1127,7 @@ class TvmDetectWTracker(AppConfig):
         self.vta_batch = 1
         self.vta_block = 16
         self.model_name = "resnet18_v1"
+        self.seed = 0
         self.debug = True
 
     def config_files(self) -> tp.Dict[str, tp.IO]:
@@ -1114,7 +1166,7 @@ class TvmDetectWTracker(AppConfig):
                 "time -p python3 /tmp/guest/deploy_classification-infer.py"
                 " /root/mxnet"
                 f" {self.device.value} {self.model_name} /tmp/guest/cat.jpg"
-                f" {self.batch_size} {self.repetitions} {int(self.debug)}"
+                f" {self.batch_size} {self.repetitions} {int(self.debug)} {self.seed}"
             ),
         ]
         return cmds
