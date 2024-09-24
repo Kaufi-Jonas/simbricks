@@ -50,4 +50,7 @@ mk/local.mk
 compile_commands.json
 .cache
 .eggs
+.hdl_checker
+.metals
+.scala-build
 .vscode
