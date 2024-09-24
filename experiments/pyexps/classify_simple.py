@@ -8,7 +8,7 @@ import itertools
 experiments = []
 
 # Experiment parameters
-host_variants = ["qk", "qt", "gt", "simics"]
+host_variants = ["qk", "qt", "gt", "gk", "simics"]
 inference_device_opts = [
     node.TvmDeviceType.VTA,
     node.TvmDeviceType.CPU,
@@ -153,6 +153,10 @@ for (
         pci_vta_id = 0
         HostClass = sim.Gem5Host
         experiment.checkpoint = True
+        sync = True
+    elif host_var == "gk":
+        pci_vta_id = 0
+        HostClass = sim.Gem5KvmHost
         sync = True
     elif host_var == "simics":
         HostClass = sim.SimicsHost
