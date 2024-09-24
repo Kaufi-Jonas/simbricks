@@ -485,10 +485,7 @@ class Gem5Host(HostSim):
         cmd = f'{env.gem5_path(self.variant)} --outdir={env.gem5_outdir(self)} '
         cmd += ' '.join(self.extra_main_args)
         cmd += (
-            f' {env.gem5_py_path} --caches --l2cache '
-            '--l1d_size=32kB --l1i_size=32kB --l2_size=32MB '
-            '--l1d_assoc=8 --l1i_assoc=8 --l2_assoc=16 '
-            f'--cacheline_size=64 --cpu-clock={self.cpu_freq}'
+            f' {env.gem5_py_path} --cpu-clock={self.cpu_freq}'
             f' --sys-clock={self.sys_clock} '
             f'--checkpoint-dir={env.gem5_cpdir(self)} '
             f'--kernel={env.gem5_kernel_path} '
