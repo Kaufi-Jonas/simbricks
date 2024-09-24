@@ -466,7 +466,7 @@ class Gem5Host(HostSim):
         self.sys_clock = '1GHz'
         self.extra_main_args = []
         self.extra_config_args = []
-        self.variant = 'fast'
+        self.sync = True
 
     def resreq_cores(self) -> int:
         return 1
@@ -514,7 +514,7 @@ class Gem5Host(HostSim):
                 f':latency={self.pci_latency}ns'
                 f':sync_interval={self.sync_period}ns'
             )
-            if cpu_type == 'TimingSimpleCPU':
+            if self.sync:
                 cmd += ':sync'
             cmd += ' '
 
@@ -525,7 +525,7 @@ class Gem5Host(HostSim):
                 f':latency={self.mem_latency}ns'
                 f':sync_interval={self.sync_period}ns'
             )
-            if cpu_type == 'TimingSimpleCPU':
+            if self.sync:
                 cmd += ':sync'
             cmd += ' '
 
@@ -537,7 +537,7 @@ class Gem5Host(HostSim):
                 f':latency={net.eth_latency}ns'
                 f':sync_interval={net.sync_period}ns'
             )
-            if cpu_type == 'TimingSimpleCPU':
+            if self.sync:
                 cmd += ':sync'
             cmd += ' '
 
@@ -553,6 +553,7 @@ class Gem5KvmHost(Gem5Host):
     def __init__(self, node_config: NodeConfig) -> None:
         super().__init__(node_config)
         self.cpu_type = 'X86KvmCPU'
+        self.sync = False
 
 
 class SimicsHost(HostSim):
