@@ -27,7 +27,7 @@ apt-get -y install --no-install-recommends \
     cmake \
     libedit-dev \
     libxml2-dev \
-    llvm-dev
+    llvm-14-dev
 
 # build tvm
 mkdir -p /root
