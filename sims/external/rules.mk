@@ -43,7 +43,8 @@ $(d)gem5/ready: $(d)gem5
 		CCFLAGS_EXTRA="-I$(abspath $(lib_dir))" \
 		LIBRARY_PATH="$(abspath $(lib_dir))" \
 		scons build/X86/gem5.$(GEM5_VARIANT) \
-		--ignore-style -j`nproc` --linker=lld
+		--ignore-style -j`nproc` --linker=mold
+	touch $@
 	touch $@
 
 gem5-clean:
