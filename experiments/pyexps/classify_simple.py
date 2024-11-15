@@ -4,25 +4,26 @@ import simbricks.orchestration.experiments as exp
 import simbricks.orchestration.simulators as sim
 import simbricks.orchestration.nodeconfig as node
 import itertools
+import os
 
 experiments = []
 
 # Experiment parameters
-host_variants = ["qk", "qt", "gt", "gk", "simics"]
+host_variants = ["qk", "qt", "gt", "gk", "ga", "simics"]
 inference_device_opts = [
     node.TvmDeviceType.VTA,
     node.TvmDeviceType.CPU,
-    node.TvmDeviceType.CPU_AVX512,
+    node.TvmDeviceType.CPU_ARM64
 ]
-vta_clk_freq_opts = [100, 200, 400, 800]
-vta_batch_opts = [1, 2, 4]
-vta_block_opts = [16, 32]
+vta_clk_freq_opts = [100, 200, 400]
+vta_batch_opts = [1, 2]
+vta_block_opts = [16]
 model_name_opts = [
     "resnet18_v1",
     "resnet34_v1",
     "resnet50_v1",
 ]
-core_opts = [1, 4, 8, 16]
+core_opts = [1, 4]
 
 
 class TvmClassifyLocal(node.AppConfig):
@@ -31,25 +32,32 @@ class TvmClassifyLocal(node.AppConfig):
     def __init__(self):
         super().__init__()
         self.pci_vta_id = 0
-        self.device = node.TvmDeviceType.VTA
+        self.target_device = node.TvmDeviceType.VTA
+        self.target_host = node.TvmDeviceType.CPU
         self.repetitions = 1
-        self.batch_size = 4
+        self.batch_size = 1
         self.vta_batch = 1
         self.vta_block = 16
         self.model_name = "resnet18_v1"
         self.debug = True
+        self.mxnet_dir = "/home/jonask/Repos/tvm-simbricks/mxnet"
 
     def config_files(self):
         # mount TVM inference script in simulated server under /tmp/guest
-        return {
+        files = {
             "deploy_classification-infer.py":
                 open(
-                    "/local/jkaufman/tvm-simbricks/vta/tutorials/frontend/deploy_classification-infer.py",
+                    "/home/jonask/Repos/tvm-simbricks/vta/tutorials/frontend/deploy_classification-infer.py",
                     "rb",
                 ),
             "cat.jpg":
-                open("/local/jkaufman/cat.jpg", "rb"),
+                open("/home/jonask/Downloads/cat.jpg", "rb"),
         }
+        for library in os.listdir(self.mxnet_dir):
+            if not library.endswith(".so"):
+                continue
+            files[library] = open(f"{self.mxnet_dir}/{library}", "rb")
+        return files
 
     def prepare_pre_cp(self) -> list[str]:
         cmds = super().prepare_pre_cp()
@@ -63,25 +71,48 @@ class TvmClassifyLocal(node.AppConfig):
             ' "LOG_ACC_BUFF_SIZE" : 17 }\' >'
             " /root/tvm/3rdparty/vta-hw/config/vta_config.json"
         ])
+        for library in os.listdir(self.mxnet_dir):
+            if not library.endswith(".so"):
+                continue
+            cmds.append(f"ln -sf /tmp/guest/{library} /root/mxnet/{library}")
         return cmds
 
     def run_cmds(self, node):
+        cmds = []
+        print(self.target_host, self.target_device)
+        if self.target_device.is_cpu():
+            cmds.extend([
+                "python3 -m tvm.exec.rpc_server --port=9091 &", "sleep 12"
+            ])
+        else:
+            cmds.extend([
+                f"VTA_DEVICE=0000:00:{(self.pci_vta_id):02x}.0 python3 -m"
+                " vta.exec.rpc_server &"
+                # wait for RPC server to start
+                "sleep 10"
+            ])
         # define commands to run on simulated server
-        cmds = [
-            # start RPC server
-            f"VTA_DEVICE=0000:00:{(self.pci_vta_id):02x}.0 python3 -m"
-            " vta.exec.rpc_server &"
-            # wait for RPC server to start
-            "sleep 6",
-            f"export VTA_RPC_HOST=127.0.0.1",
-            f"export VTA_RPC_PORT=9091",
-            # run inference
+        cmds.extend([
+            "export VTA_RPC_HOST=127.0.0.1",
+            "export VTA_RPC_PORT=9091",
+            "export SIMULATOR=gem5",  # TODO Actually set this depending on simulator
+            "m5 checkpoint",
+            # run warmup inference
             (
                 "python3 /tmp/guest/deploy_classification-infer.py /root/mxnet"
-                f" {self.device.value} {self.model_name} /tmp/guest/cat.jpg"
-                f" {self.batch_size} {self.repetitions} {int(self.debug)}"
+                f" {self.target_device.value} {self.target_host.value} {self.model_name} /tmp/guest/cat.jpg"
+                f" {self.batch_size} {self.repetitions} {int(self.debug)} 0"
             ),
-        ]
+            # dump stats every 100 ms
+            "m5 resetstats",
+            "m5 dumpstats 100000000 100000000",
+            # run actual inference
+            (
+                "python3 /tmp/guest/deploy_classification-infer.py /root/mxnet"
+                f" {self.target_device.value} {self.target_host.value} {self.model_name} /tmp/guest/cat.jpg"
+                f" {self.batch_size} {self.repetitions} {int(self.debug)} 0"
+            ),
+        ])
         return cmds
 
 
@@ -92,9 +123,9 @@ class VtaNode(node.NodeConfig):
         # Use locally built disk image
         self.disk_image = "vta_classification"
         # Bump amount of system memory
-        self.memory = 4 * 1024
+        self.memory = 2 * 1024
         # Reserve physical range of memory for the VTA user-space driver
-        self.kcmd_append = " memmap=512M!1G"
+        self.kcmd_append = " memmap=512M$1G iomem=relaxed"
 
     def prepare_pre_cp(self):
         # Define commands to run before application to configure the server
@@ -154,6 +185,21 @@ for (
         HostClass = sim.Gem5Host
         experiment.checkpoint = True
         sync = True
+    elif host_var == "ga":
+        pci_vta_id = 3
+
+        class CustomGem5ArmHost(sim.Gem5ArmHost):
+
+            def __init__(self, node_config: sim.NodeConfig) -> None:
+                super().__init__(node_config)
+                self.cpu_freq = "1200MHz"
+                self.cpu_type = "hpi"
+                self.variant = "fast"
+                # self.extra_script_args.append("--write-terminal-output")
+
+        HostClass = CustomGem5ArmHost
+        experiment.checkpoint = True
+        sync = False
     elif host_var == "gk":
         pci_vta_id = 0
         HostClass = sim.Gem5KvmHost
@@ -170,7 +216,12 @@ for (
         server_cfg.disk_image += "-simics"
         server_cfg.kcmd_append = ""
     server_cfg.app = TvmClassifyLocal()
-    server_cfg.app.device = inference_device
+    server_cfg.app.target_device = inference_device
+    if inference_device.is_cpu():
+        server_cfg.app.target_host = inference_device
+    if host_var == "ga":
+        server_cfg.app.target_host = node.TvmDeviceType.CPU_ARM64
+        server_cfg.disk_image = "vta"
     server_cfg.app.vta_batch = vta_batch
     server_cfg.app.vta_block = vta_block
     server_cfg.app.model_name = model_name
@@ -198,6 +249,7 @@ for (
 
     # Add both simulators to experiment
     experiment.add_host(server)
-    experiment.add_pcidev(vta)
+    if inference_device == node.TvmDeviceType.VTA:
+        experiment.add_pcidev(vta)
 
     experiments.append(experiment)

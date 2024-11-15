@@ -1070,6 +1070,14 @@ class TvmDeviceType(enum.Enum):
     VTA = 'vta'
     CPU = 'cpu'
     CPU_AVX512 = 'cpu_avx512'
+    CPU_ARM64 = 'cpu_arm64'
+
+    def is_cpu(self) -> bool:
+        return self in [
+            TvmDeviceType.CPU,
+            TvmDeviceType.CPU_AVX512,
+            TvmDeviceType.CPU_ARM64
+        ]
 
 
 class TvmDetectWTracker(AppConfig):
