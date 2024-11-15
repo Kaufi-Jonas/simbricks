@@ -28,14 +28,14 @@ import simbricks.orchestration.experiments as exp
 import simbricks.orchestration.nodeconfig as node
 import simbricks.orchestration.simulators as sim
 
-host_types = ['gem5', 'simics', 'qemu']
+host_types = ['gem5', 'simics', 'qemu', 'gem5_arm']
 experiments = []
 
 
 class Cpuinfo(node.AppConfig):
 
     def run_cmds(self, _: node.NodeConfig) -> tp.List[str]:
-        return ['mount -t proc proc /proc', 'cat /proc/cpuinfo']
+        return ['mount -t proc proc /proc', 'cat /proc/cpuinfo', 'lspci -vv']
 
 
 # Create multiple experiments with different simulator permutations, which can
@@ -50,6 +50,12 @@ for host_type in host_types:
     if host_type == 'gem5':
         host = sim.Gem5Host(node_config)
         e.checkpoint = True
+    elif host_type == 'gem5_arm':
+        host = sim.Gem5ArmHost(node_config)
+        host.cpu_type = "atomic"
+        e.checkpoint = False
+        node_config.nockp = True
+        host.sync = False
     elif host_type == 'simics':
         host = sim.SimicsHost(node_config)
         host.sync = True
@@ -63,6 +69,11 @@ for host_type in host_types:
     host.name = 'host.0'
     e.add_host(host)
     host.wait = True
+
+    vta = sim.VTADev()
+    vta.clock_freq = 10
+    host.add_pcidev(vta)
+    e.add_pcidev(vta)
 
     # add to experiments
     experiments.append(e)
