@@ -26,6 +26,7 @@ PACKER_VERSION := 1.7.0
 KERNEL_VERSION := 5.15.93
 
 BASE_IMAGE := $(d)output-base/base
+BASE_SIMICS_IMAGE := $(d)output-base_simics/base_simics
 MEMCACHED_IMAGE := $(d)output-memcached/memcached
 NOPAXOS_IMAGE := $(d)output-nopaxos/nopaxos
 MTCP_IMAGE := $(d)output-mtcp/mtcp
@@ -87,6 +88,15 @@ $(BASE_IMAGE): $(packer) $(QEMU) $(bz_image) $(m5_bin) $(kheader_tar) \
 	    $(img_dir)/input-base/
 	cd $(img_dir) && ./packer-wrap.sh base base base.pkr.hcl \
 	    $(COMPRESSED_IMAGES)
+	rm -rf $(img_dir)/input-base
+	touch $@
+
+$(BASE_SIMICS_IMAGE): $(packer) $(QEMU) $(BASE_IMAGE) \
+    $(addprefix $(d), extended-image.pkr.hcl scripts/install-base_simics.sh \
+      scripts/cleanup.sh)
+	rm -rf $(dir $@)
+	cd $(img_dir) && ./packer-wrap.sh base base_simics \
+	    extended-image.pkr.hcl $(COMPRESSED_IMAGES)
 	rm -rf $(img_dir)/input-base
 	touch $@
 
