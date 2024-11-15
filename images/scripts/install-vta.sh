@@ -23,7 +23,6 @@ apt-get -y install --no-install-recommends \
     python3-tornado \
     libtinfo-dev \
     zlib1g-dev \
-    build-essential \
     cmake \
     libedit-dev \
     libxml2-dev \
@@ -31,7 +30,7 @@ apt-get -y install --no-install-recommends \
 
 # build tvm
 mkdir -p /root
-git clone --depth 10 --recursive --branch vta_whitepaper_v0.15 https://github.com/jonas-kaufmann/tvm-simbricks.git /root/tvm
+git clone --depth 1 --recursive --branch vta_whitepaper_v0.15 https://github.com/jonas-kaufmann/tvm-simbricks.git /root/tvm
 cd /root/tvm
 cp 3rdparty/vta-hw/config/simbricks_pci_sample.json 3rdparty/vta-hw/config/vta_config.json
 mkdir build
