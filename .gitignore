@@ -69,3 +69,5 @@ compile_commands.json
 .metals
 .scala-build
 .vscode
+.metals
+.scala-build
