@@ -49,7 +49,12 @@ class ExpEnv(object):
         self.gem5_py_path = (
             f'{self.repodir}/sims/external/gem5/configs/simbricks/simbricks.py'
         )
+        self.gem5_arm_py_path = (
+            f'{self.repodir}/sims/external/gem5/configs/simbricks/simbricks_arm.py'
+        )
         self.gem5_kernel_path = f'{self.repodir}/images/vmlinux'
+        self.gem5_arm_kernel_path = f'{self.repodir}/images_arm64/vmlinux'
+        self.gem5_arm_bootlader_path = f'{self.repodir}/sims/external/gem5/system/arm/bootloader/arm64/boot.arm64'
         simics_project_base = f'{self.repodir}/sims/external/simics/project'
         self.simics_path = f'{simics_project_base}/simics'
         self.simics_gui_path = f'{simics_project_base}/simics-gui'
@@ -59,6 +64,9 @@ class ExpEnv(object):
 
     def gem5_path(self, variant: str) -> str:
         return f'{self.repodir}/sims/external/gem5/build/X86/gem5.{variant}'
+
+    def gem5_arm_path(self, variant: str) -> str:
+        return f'{self.repodir}/sims/external/gem5/build/ARM/gem5.{variant}'
 
     def hdcopy_path(self, sim: 'simulators.Simulator') -> str:
         return f'{self.workdir}/hdcopy.{sim.name}'
