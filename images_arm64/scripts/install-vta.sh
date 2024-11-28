@@ -10,7 +10,7 @@ mkdir build
 cp cmake/config.cmake build
 cd build
 echo "set(USE_LLVM OFF)" >> config.cmake
-CMAKE_BUILD_TYPE=RelWithDebInfo cmake ..
+cmake ..
 make -j`nproc` runtime vta
 
 # add pre-tuned autotvm configurations
