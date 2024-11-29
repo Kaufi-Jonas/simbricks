@@ -1216,6 +1216,8 @@ class XsimDev(PCIDevSim):
         saif_sampling_period_ns."""
         self.gui = False
         """Whether to show xsim's GUI."""
+        self.libs = ["unisims_ver"]
+        """Libraries to link when running `xelab`."""
 
     def resreq_mem(self) -> int:
         return 512  # this is a guess;
@@ -1244,6 +1246,12 @@ class XsimDev(PCIDevSim):
         cmds.append(f'xsim {gui_param} --tclbatch {tcl_path} simbricks_sim')
         cmd = ' && '.join(cmds)
         return f'bash -c \'{cmd}\''
+
+    def _link_libs(self) -> str:
+        link_flags = []
+        for lib in self.libs:
+            link_flags.append(f"-L {lib}")
+        return " ".join(link_flags)
 
     def _write_tcl_script(
         self, tcl_path: str, saif_path_without_suffix: str
