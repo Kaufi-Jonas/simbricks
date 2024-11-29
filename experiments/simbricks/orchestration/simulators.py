@@ -555,6 +555,71 @@ class Gem5KvmHost(Gem5Host):
         self.sync = False
 
 
+class Gem5ArmHost(HostSim):
+    """gem5 ARM host simulator."""
+
+    def __init__(self, node_config: NodeConfig) -> None:
+        node_config.sim = 'gem5'
+        super().__init__(node_config)
+        self.cpu_type_cp = 'atomic'
+        self.cpu_type = 'atomic'
+        self.extra_main_args = []
+        self.extra_script_args = []
+        self.variant = 'opt'
+        self.sync = False
+        """Whether to synchronize with connected simulators. This is not
+        compatible with atomic CPU models."""
+
+    def resreq_cores(self) -> int:
+        return 1
+
+    def resreq_mem(self) -> int:
+        return 4096
+
+    def run_cmd(self, env: ExpEnv) -> str:
+        cpu_type = self.cpu_type
+        if env.create_cp:
+            cpu_type = self.cpu_type_cp
+
+        cmd = f'{env.gem5_arm_path(self.variant)} --outdir={env.gem5_outdir(self)} '
+        cmd += ' '.join(self.extra_main_args)
+        cmd += (
+            f' {env.gem5_arm_py_path} '
+            f'--cpu-freq={self.cpu_freq} '
+            f'--checkpoint-dir={env.gem5_cpdir(self)} '
+            f'--kernel={env.gem5_arm_kernel_path} '
+            f'--bootloader={env.gem5_arm_bootlader_path} '
+            f'--disk-image={env.hd_raw_arm_path(self.node_config.disk_image)} '
+            f'--disk-image={env.cfgtar_path(self)} '
+            f'--cpu={cpu_type} --mem-size={self.node_config.memory}MB '
+            f'--num-cores={self.node_config.cores} '
+            '--mem-type=DDR4_2400_16x4 '
+        )
+        if self.node_config.kcmd_append:
+            cmd += f'--kernel-cmdline-append="{self.node_config.kcmd_append}" '
+        cmd += ' '.join(self.extra_script_args)
+
+        if env.restore_cp:
+            cpt_dirs = [
+                os.path.join(env.gem5_cpdir(self), dir)
+                for dir in os.listdir(env.gem5_cpdir(self))
+                if dir.startswith("cpt")
+            ]
+            cmd += f'--restore {cpt_dirs[0]} '
+
+        for dev in self.pcidevs:
+            cmd += (
+                f'--simbricks-pci=connect:{env.dev_pci_path(dev)}'
+                f':latency={self.pci_latency}ns'
+                f':sync_interval={self.sync_period}ns'
+            )
+            if self.sync and not env.create_cp:
+                cmd += ':sync'
+            cmd += ' '
+
+        return cmd
+
+
 class SimicsHost(HostSim):
     """Simics host simulator."""
 
