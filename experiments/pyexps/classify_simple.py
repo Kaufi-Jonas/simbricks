@@ -57,6 +57,9 @@ class TvmClassifyLocal(node.AppConfig):
             if not library.endswith(".so"):
                 continue
             files[library] = open(f"{self.mxnet_dir}/{library}", "rb")
+        files["cma_malloc.ko"] = open(
+            "/home/jonask/Repos/cma_malloc/module/cma_malloc.ko", "rb"
+        )
         return files
 
     def prepare_pre_cp(self) -> list[str]:
@@ -75,6 +78,7 @@ class TvmClassifyLocal(node.AppConfig):
             if not library.endswith(".so"):
                 continue
             cmds.append(f"ln -sf /tmp/guest/{library} /root/mxnet/{library}")
+        cmds.append("insmod /tmp/guest/cma_malloc.ko")
         return cmds
 
     def run_cmds(self, node):
@@ -125,7 +129,7 @@ class VtaNode(node.NodeConfig):
         # Bump amount of system memory
         self.memory = 2 * 1024
         # Reserve physical range of memory for the VTA user-space driver
-        self.kcmd_append = " memmap=512M$1G iomem=relaxed"
+        self.kcmd_append = "cma=512M@0G-4G"
 
     def prepare_pre_cp(self):
         # Define commands to run before application to configure the server
