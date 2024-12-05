@@ -91,6 +91,22 @@ class ExpEnv(object):
             f'{hd_name_or_path}.raw'
         )
 
+    def hd_arm_path(self, hd_name_or_path: str) -> str:
+        if ExpEnv.is_absolute_exists(hd_name_or_path):
+            return hd_name_or_path
+        return (
+            f'{self.repodir}/images_arm64/output-{hd_name_or_path}/'
+            f'{hd_name_or_path}'
+        )
+
+    def hd_raw_arm_path(self, hd_name_or_path: str) -> str:
+        if ExpEnv.is_absolute_exists(hd_name_or_path):
+            return f'{hd_name_or_path}.raw'
+        return (
+            f'{self.repodir}/images_arm64/output-{hd_name_or_path}/'
+            f'{hd_name_or_path}.raw'
+        )
+
     def cfgtar_path(self, sim: 'simulators.Simulator') -> str:
         return f'{self.workdir}/cfg.{sim.name}.tar'
 
