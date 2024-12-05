@@ -61,6 +61,7 @@ class ExpEnv(object):
         self.simics_qsp_modern_core_path = (
             f'{simics_project_base}/targets/qsp-x86/qsp-modern-core.simics'
         )
+        self.vivado_installdir = '/home/jonask/Xilinx/Vivado/2023.1'
 
     def gem5_path(self, variant: str) -> str:
         return f'{self.repodir}/sims/external/gem5/build/X86/gem5.{variant}'
