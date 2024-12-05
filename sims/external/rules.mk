@@ -50,7 +50,7 @@ $(d)gem5/ready_arm: $(d)gem5
 	cd $< && \
 		CCFLAGS_EXTRA="-I$(abspath $(lib_dir))" \
 		LIBRARY_PATH="$(abspath $(lib_dir))" \
-		scons build/ARM/gem5.$(GEM5_VARIANT) \
+		scons build/ARM/gem5.fast \
 		--ignore-style -j`nproc` --linker=mold
 	touch $@
 
