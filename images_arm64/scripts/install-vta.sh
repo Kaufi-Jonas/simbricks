@@ -10,6 +10,7 @@ mkdir build
 cp cmake/config.cmake build
 cd build
 echo "set(USE_LLVM OFF)" >> config.cmake
+echo "set(SUMMARIZE ON)" >> config.cmake
 cmake ..
 make -j`nproc` runtime vta
 
