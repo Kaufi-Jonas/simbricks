@@ -17,7 +17,7 @@ inference_device_opts = [
     node.TvmDeviceType.CPU_ARM64,
 ]
 vta_clk_freq_opts = [100, 167]
-vta_batch_opts = [1, 2]
+vta_batch_opts = [1]
 vta_block_opts = [16]
 model_name_opts = [
     "resnet18_v1",
@@ -25,6 +25,7 @@ model_name_opts = [
     "resnet50_v1",
 ]
 core_opts = [1, 4]
+log_opts = ["l", "nl"]
 
 
 class TvmClassifyLocal(node.AppConfig):
@@ -41,7 +42,7 @@ class TvmClassifyLocal(node.AppConfig):
         self.vta_block = 16
         self.model_name = "resnet18_v1"
         self.debug = True
-        self.mxnet_dir = "/home/jonask/Repos/tvm-simbricks/mxnet"
+        self.env_simulator = None
 
     def config_files(self):
         # mount TVM inference script in simulated server under /tmp/guest
@@ -115,8 +116,13 @@ class TvmClassifyLocal(node.AppConfig):
                     f" {self.batch_size} {self.repetitions} {int(self.debug)} 0"
                 ),
                 "rm /tmp/vta_dry_run",
-                "export SIMULATOR=gem5",  # TODO Actually set this depending on simulator
-                # run actual inference
+            ]
+        )
+        if self.env_simulator is not None:
+            cmds.append(f"export SIMULATOR={self.env_simulator}")
+            # run actual inference
+        cmds.extend(
+            [
                 (
                     "python3 /tmp/guest/deploy_classification-infer.py"
                     " /root/mxnet"
@@ -176,6 +182,7 @@ for (
     model_name,
     cores,
     rtl_variant,
+    log_opt,
 ) in itertools.product(
     host_variants,
     inference_device_opts,
@@ -185,9 +192,10 @@ for (
     model_name_opts,
     core_opts,
     rtl_variants,
+    log_opts,
 ):
     experiment = exp.Experiment(
-        f"cs-{model_name}-{inference_device.value}-{host_var}-{cores}-{vta_clk_freq}-{vta_batch}x{vta_block}-{rtl_variant}"
+        f"{model_name}-{inference_device.value}-{host_var}-{cores}-{vta_clk_freq}-{rtl_variant}-{log_opt}"
     )
     pci_vta_id = 2
     sync = False
@@ -231,6 +239,8 @@ for (
         server_cfg.disk_image += "-simics"
         server_cfg.kcmd_append = ""
     server_cfg.app = TvmClassifyLocal()
+    if host_var in ["gt", "gk", "ga"] and log_opt == "l":
+        server_cfg.app.env_simulator = "gem5"
     server_cfg.app.target_device = inference_device
     if inference_device.is_cpu():
         server_cfg.app.target_host = inference_device
@@ -257,21 +267,23 @@ for (
             vta = sim.XsimDev(
                 "vta_xsim",
                 100,
-                "/home/jonask/Repos/vivado_vta/vivado_vta.sim/sim_1/synth/func/xsim/vta_sim_vlog.prj",
+                "/local/jkaufman/vivado_vta/vivado_vta.sim/sim_1/synth/func/xsim/vta_sim_vlog.prj",
                 "vta_sim",
             )
-            vta.saif_sampling_period_ns = 10 * 10**6
-            vta.saif_sampling_length_ns = 10 * 10**6
+            if log_opt == "l":
+                vta.saif_sampling_period_ns = 10 * 10**6
+                vta.saif_sampling_length_ns = 10 * 10**6
         elif rtl_variant == "rtl":
             vta = sim.XsimDev(
                 "vta_xsim_rtl",
                 100,
-                "/home/jonask/Repos/vivado_vta/vivado_vta.sim/sim_1/behav/xsim/vta_sim_behav_vlog.prj",
+                "/local/jkaufman/vivado_vta/vivado_vta.sim/sim_1/behav/xsim/vta_sim_behav_vlog.prj",
                 "vta_sim_behav",
             )
             vta.libs = []
-            vta.saif_sampling_period_ns = 10 * 10**6
-            vta.saif_sampling_length_ns = 10 * 10**6
+            if log_opt == "l":
+                vta.saif_sampling_period_ns = 10 * 10**6
+                vta.saif_sampling_length_ns = 10 * 10**6
         else:
             raise NameError(f"Unknown rtl_variant {rtl_variant}")
         vta.clock_freq = vta_clk_freq
