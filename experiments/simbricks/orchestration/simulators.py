@@ -1263,7 +1263,7 @@ class XsimDev(PCIDevSim):
     ) -> None:
         super().__init__()
         self.name = name
-        self.clk_freq = clk_freq_mhz
+        self.clock_freq = clk_freq_mhz
         """Clock frequency in MHz."""
         self.vivado_sim_prj_file = vivado_sim_prj_file
         """Path to the .prj file that contains the paths to all Verilog
@@ -1303,7 +1303,7 @@ class XsimDev(PCIDevSim):
             f'"SIMBRICKS_PCI_SOCKET={env.dev_pci_path(self)}" --generic_top '
             f'"SHM_PATH={env.dev_shm_path(self)}" --generic_top '
             f'"SYNC_PERIOD={self.sync_period}" --generic_top '
-            f'"CLK_FREQ_MHZ={self.clk_freq}" --generic_top '
+            f'"CLK_FREQ_MHZ={self.clock_freq}" --generic_top '
             f'"PCI_LATENCY={self.pci_latency}" '
             f'xil_defaultlib.{self.top_module} xil_defaultlib.glbl'
         )
